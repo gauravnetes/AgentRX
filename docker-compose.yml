@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # 1. Relational Database (Users, Pipeline Runs)
+  postgres:
+    image: postgres:15-alpine
+    container_name: agentrx_postgres
+    environment:
+      POSTGRES_USER: agentrx_user
+      POSTGRES_PASSWORD: agentrx_pass
+      POSTGRES_DB: agentrx_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # 2. Message Broker (Celery Async Queues & Caching)
+  redis:
+    image: redis:7-alpine
+    container_name: agentrx_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  # 3. Vector Database (RAG / Internal Knowledge Agent)
+  chromadb:
+    image: chromadb/chroma:0.4.24
+    container_name: agentrx_chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma_data
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma_data
+    restart: unless-stopped
+
+  # 4. Local S3 Storage (Archiving PDF & Excel Reports)
+  minio:
+    image: minio/minio:latest
+    container_name: agentrx_minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # API Port
+      - "9001:9001" # Web Console Port
+    volumes:
+      - minio_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  chroma_data:
+  minio_data:
