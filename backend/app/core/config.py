@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     # LLM Settings 
     LLM_PROVIDER: str 
     LLM_MODEL_NAME: str 
-    MISTRAL_API_KEY: str 
+    GOOGLE_API_KEY: str
     
     S3_ENDPOINT_URL: str 
     S3_BUCKET: str 

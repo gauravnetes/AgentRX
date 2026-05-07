@@ -1,6 +1,7 @@
 from fastapi import FastAPI 
 from fastapi.middleware.cors import CORSMiddleware 
 from app.core.config import settings 
+from app.api.routes.pipeline import router as pipeline_router 
 
 
 def create_app() -> FastAPI: 
@@ -16,6 +17,8 @@ def create_app() -> FastAPI:
         allow_methods=["*"], 
         allow_headers=["*"],
     )
+    
+    app.include_router(pipeline_router, prefix="/api/pipeline", tags=["Pipeline Execution"])
         
     @app.get("/health", tags=["System"])
     async def health_check(): 
