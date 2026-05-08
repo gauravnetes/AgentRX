@@ -3,6 +3,7 @@ import operator
 
 class AgentRXState(TypedDict):
     molecule: str
+    synonyms: str
     job_status: str
 
     # Phase 1: Parallel Discovery

@@ -1,122 +1,123 @@
 #,DrugBank_ID,Molecule Name,Therapy Area,Formulation,Channel,Month,Units Sold,Avg Unit Price (USD),Revenue (USD),Market Share (%),YoY Growth (%),Country,Data Source Tag
-1,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet, PhRetailarmacy,Nov-24,13934,575.36,"8,017,066.24",34.5,-7.3,Germany,IQVIA_MOCK_v1
-2,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Government/Tender,Feb-24,4405,80.09,"352,796.45",9.9,20.5,India,IQVIA_MOCK_v1
-3,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Export,Jan-24,71926,356.88,"25,668,950.88",18.0,3.0,China,IQVIA_MOCK_v1
-4,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Hospital,Dec-24,55892,289.54,"16,182,969.68",7.0,39.7,Germany,IQVIA_MOCK_v1
-5,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Online Pharmacy,May-24,12656,323.25,"4,091,052.00",14.6,6.6,USA,IQVIA_MOCK_v1
-6,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Online Pharmacy,Apr-24,60717,456.03,"27,688,773.51",37.5,8.4,India,IQVIA_MOCK_v1
-7,DB00619,Imatinib,Oncology,Oral Capsule,Retail Pharmacy,Sep-24,6506,562.24,"3,657,933.44",30.0,41.2,USA,IQVIA_MOCK_v1
-8,DB00619,Imatinib,Oncology,Oral Capsule,Retail Pharmacy,May-24,50323,236.64,"11,908,434.72",24.9,7.7,USA,IQVIA_MOCK_v1
-9,DB00619,Imatinib,Oncology,Oral Capsule,Online Pharmacy,Nov-24,27960,569.81,"15,931,887.60",27.4,24.9,UK,IQVIA_MOCK_v1
-10,DB00619,Imatinib,Oncology,Oral Capsule,Hospital,Oct-24,70510,619.89,"43,708,443.90",7.3,8.5,Germany,IQVIA_MOCK_v1
-11,DB00619,Imatinib,Oncology,Oral Capsule,Export,Jun-24,43004,716.5,"30,812,366.00",30.1,0.4,China,IQVIA_MOCK_v1
-12,DB00619,Imatinib,Oncology,Oral Capsule,Hospital,Dec-24,53081,227.95,"12,099,813.95",9.1,38.9,UK,IQVIA_MOCK_v1
-13,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Government/Tender,Mar-25,19226,225.52,"4,335,847.52",10.4,18.3,South Korea,IQVIA_MOCK_v1
-14,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Online Pharmacy,Dec-24,76984,339.79,"26,158,393.36",9.4,41.9,Japan,IQVIA_MOCK_v1
-15,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Jun-24,12415,642.54,"7,977,134.10",33.3,-3.7,South Korea,IQVIA_MOCK_v1
-16,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Retail Pharmacy,Apr-24,78672,54.47,"4,285,263.84",15.4,41.8,Japan,IQVIA_MOCK_v1
-17,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Nov-24,73012,731.73,"53,425,070.76",1.6,26.9,Brazil,IQVIA_MOCK_v1
-18,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Aug-24,45087,95.26,"4,294,987.62",17.4,12.5,Brazil,IQVIA_MOCK_v1
-19,DB01041,Thalidomide,Oncology,Oral Capsule,Hospital,Dec-24,67040,517.82,"34,714,652.80",6.9,29.2,Brazil,IQVIA_MOCK_v1
-20,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Mar-25,79004,275.87,"21,794,833.48",1.9,38.2,India,IQVIA_MOCK_v1
-21,DB01041,Thalidomide,Oncology,Oral Capsule,Online Pharmacy,May-24,8092,205.12,"1,659,831.04",22.4,-7.7,China,IQVIA_MOCK_v1
-22,DB01041,Thalidomide,Oncology,Oral Capsule,Government/Tender,Sep-24,70322,651.08,"45,785,247.76",6.0,13.7,USA,IQVIA_MOCK_v1
-23,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Mar-24,35241,448.76,"15,814,751.16",23.8,40.1,Germany,IQVIA_MOCK_v1
-24,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Feb-25,41357,339.44,"14,038,220.08",26.3,8.2,China,IQVIA_MOCK_v1
-25,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Mar-25,3257,500.27,"1,629,379.39",9.8,-0.1,UK,IQVIA_MOCK_v1
-26,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Sep-24,30507,57.76,"1,762,084.32",2.4,5.8,India,IQVIA_MOCK_v1
-27,DB00877,Rapamycin,Immunology,Oral Tablet,Export,Aug-24,37000,568.8,"21,045,600.00",9.2,-4.9,China,IQVIA_MOCK_v1
-28,DB00877,Rapamycin,Immunology,Oral Tablet,Export,Feb-24,32350,667.03,"21,578,420.50",31.3,-1.7,South Korea,IQVIA_MOCK_v1
-29,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Apr-24,46938,360.33,"16,913,169.54",18.6,27.4,Japan,IQVIA_MOCK_v1
-30,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Nov-24,53272,619.12,"32,981,760.64",31.1,-6.1,India,IQVIA_MOCK_v1
-31,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Retail Pharmacy,Apr-24,61137,212.71,"13,004,451.27",35.6,11.9,Brazil,IQVIA_MOCK_v1
-32,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Export,Mar-25,7130,554.5,"3,953,585.00",21.4,-11.2,USA,IQVIA_MOCK_v1
-33,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Hospital,Sep-24,22298,345.75,"7,709,533.50",19.2,34.7,China,IQVIA_MOCK_v1
-34,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Hospital,Aug-24,50172,2.33,"116,900.76",15.8,38.0,Germany,IQVIA_MOCK_v1
-35,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Government/Tender,Mar-24,55944,592.25,"33,132,834.00",28.4,30.3,Brazil,IQVIA_MOCK_v1
-36,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Government/Tender,Jul-24,25390,252.55,"6,412,244.50",37.3,19.3,Germany,IQVIA_MOCK_v1
-37,DB00678,Losartan,Cardiovascular,Oral Tablet,Export,Sep-24,66409,781.52,"51,899,961.68",21.0,-8.9,South Korea,IQVIA_MOCK_v1
-38,DB00678,Losartan,Cardiovascular,Oral Tablet,Export,Jan-24,24856,58.71,"1,459,295.76",3.7,34.5,USA,IQVIA_MOCK_v1
-39,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Dec-24,75168,209.66,"15,759,722.88",23.4,21.4,USA,IQVIA_MOCK_v1
-40,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Jun-24,34679,174.02,"6,034,839.58",27.9,0.9,UK,IQVIA_MOCK_v1
-41,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Feb-25,39821,388.91,"15,486,785.11",35.9,38.5,Germany,IQVIA_MOCK_v1
-42,DB00678,Losartan,Cardiovascular,Oral Tablet,Hospital,Nov-24,74292,846.68,"62,901,550.56",3.9,-0.5,South Korea,IQVIA_MOCK_v1
-43,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Online Pharmacy,May-24,57933,708.77,"41,061,172.41",27.4,21.0,Germany,IQVIA_MOCK_v1
-44,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Export,Mar-24,73192,254.82,"18,650,785.44",25.9,38.7,India,IQVIA_MOCK_v1
-45,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Retail Pharmacy,Jun-24,15629,756.31,"11,820,368.99",28.9,-3.6,Brazil,IQVIA_MOCK_v1
-46,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Online Pharmacy,Feb-24,45442,173.46,"7,882,369.32",24.9,2.3,China,IQVIA_MOCK_v1
-47,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Government/Tender,Apr-24,7158,78.91,"564,837.78",17.0,2.9,Brazil,IQVIA_MOCK_v1
-48,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Hospital,Jan-25,17646,541.73,"9,559,367.58",11.0,28.0,UK,IQVIA_MOCK_v1
-49,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Hospital,Sep-24,72011,31.11,"2,240,262.21",15.0,17.8,Germany,IQVIA_MOCK_v1
-50,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Government/Tender,Dec-24,5982,262.37,"1,569,497.34",34.7,31.0,Germany,IQVIA_MOCK_v1
-51,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Hospital,Jul-24,28035,579.92,"16,258,057.20",26.1,7.1,UK,IQVIA_MOCK_v1
-52,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Export,Mar-25,20757,786.94,"16,334,513.58",10.0,-3.2,Japan,IQVIA_MOCK_v1
-53,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Retail Pharmacy,Jan-24,3748,152.87,"572,956.76",35.7,30.2,Japan,IQVIA_MOCK_v1
-54,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Government/Tender,Feb-24,35470,135.74,"4,814,697.80",27.4,8.7,China,IQVIA_MOCK_v1
-55,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Jan-24,30331,189.87,"5,758,946.97",25.8,9.5,Brazil,IQVIA_MOCK_v1
-56,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Feb-25,37085,298.8,"11,080,998.00",20.2,24.7,USA,IQVIA_MOCK_v1
-57,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Export,Aug-24,4117,98.48,"405,442.16",37.4,-2.4,UK,IQVIA_MOCK_v1
-58,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Apr-24,14708,507.29,"7,461,221.32",14.1,30.5,India,IQVIA_MOCK_v1
-59,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Government/Tender,Dec-24,50988,764.63,"38,986,954.44",8.3,-9.6,USA,IQVIA_MOCK_v1
-60,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Government/Tender,Jan-25,68646,786.78,"54,009,299.88",21.3,26.8,India,IQVIA_MOCK_v1
-61,DB00073,Rituximab,Oncology,IV Infusion,Hospital,Dec-24,41645,564.05,"23,489,862.25",5.8,36.6,UK,IQVIA_MOCK_v1
-62,DB00073,Rituximab,Oncology,IV Infusion,Export,Mar-25,54028,277.59,"14,997,632.52",27.2,17.9,Brazil,IQVIA_MOCK_v1
-63,DB00073,Rituximab,Oncology,IV Infusion,Retail Pharmacy,Nov-24,50195,575.88,"28,906,296.60",34.9,21.2,Japan,IQVIA_MOCK_v1
-64,DB00073,Rituximab,Oncology,IV Infusion,Online Pharmacy,Apr-24,72319,708.75,"51,256,091.25",12.5,-0.7,Japan,IQVIA_MOCK_v1
-65,DB00073,Rituximab,Oncology,IV Infusion,Export,Jun-24,61446,375.8,"23,091,406.80",26.4,15.6,UK,IQVIA_MOCK_v1
-66,DB00073,Rituximab,Oncology,IV Infusion,Retail Pharmacy,Jul-24,37696,438.38,"16,525,172.48",24.8,6.1,USA,IQVIA_MOCK_v1
-67,DB09037,Pembrolizumab,Oncology,IV Infusion,Retail Pharmacy,Feb-25,3701,39.76,"147,151.76",37.9,21.0,Germany,IQVIA_MOCK_v1
-68,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,Jan-25,54821,753.27,"41,295,014.67",22.7,26.8,South Korea,IQVIA_MOCK_v1
-69,DB09037,Pembrolizumab,Oncology,IV Infusion,Government/Tender,Apr-24,52883,207.76,"10,986,972.08",25.7,-11.7,South Korea,IQVIA_MOCK_v1
-70,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,Nov-24,29183,149.92,"4,375,115.36",36.9,16.0,Japan,IQVIA_MOCK_v1
-71,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,May-24,16406,388.26,"6,369,793.56",31.1,24.0,China,IQVIA_MOCK_v1
-72,DB09037,Pembrolizumab,Oncology,IV Infusion,Export,Mar-25,58508,520.95,"30,479,742.60",28.0,15.3,UK,IQVIA_MOCK_v1
-73,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Online Pharmacy,Feb-25,36847,651.06,"23,989,607.82",20.6,21.8,China,IQVIA_MOCK_v1
-74,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Online Pharmacy,Sep-24,10655,606.66,"6,463,962.30",9.9,6.1,South Korea,IQVIA_MOCK_v1
-75,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Export,Aug-24,18636,128.63,"2,397,148.68",15.5,-3.7,USA,IQVIA_MOCK_v1
-76,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Retail Pharmacy,Mar-24,54877,346.76,"19,029,148.52",21.4,10.5,USA,IQVIA_MOCK_v1
-77,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Retail Pharmacy,Jan-25,51549,769.16,"39,649,428.84",23.0,25.6,Japan,IQVIA_MOCK_v1
-78,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Export,Nov-24,63018,5.51,"347,229.18",14.3,28.7,Japan,IQVIA_MOCK_v1
-79,DB11699,Dupilumab,Immunology,SC Injection,Retail Pharmacy,Feb-25,29260,232.36,"6,798,853.60",19.3,9.0,South Korea,IQVIA_MOCK_v1
-80,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Mar-25,61761,781.65,"48,275,485.65",37.8,16.8,Germany,IQVIA_MOCK_v1
-81,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Jul-24,11503,546.52,"6,286,619.56",6.3,12.9,India,IQVIA_MOCK_v1
-82,DB11699,Dupilumab,Immunology,SC Injection,Hospital,Sep-24,50189,278.59,"13,982,153.51",18.2,6.2,Brazil,IQVIA_MOCK_v1
-83,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Dec-24,55755,214.8,"11,976,174.00",4.3,-11.0,Brazil,IQVIA_MOCK_v1
-84,DB11699,Dupilumab,Immunology,SC Injection,Export,Oct-24,46370,190.98,"8,855,742.60",3.8,39.7,India,IQVIA_MOCK_v1
-85,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Export,Jan-24,31766,107.72,"3,421,833.52",26.2,18.5,Germany,IQVIA_MOCK_v1
-86,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Retail Pharmacy,Jan-25,34086,651.98,"22,223,390.28",7.5,20.8,South Korea,IQVIA_MOCK_v1
-87,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Mar-25,41268,92.33,"3,810,274.44",2.2,4.8,Germany,IQVIA_MOCK_v1
-88,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Government/Tender,Apr-24,26495,65.06,"1,723,764.70",27.0,21.9,Japan,IQVIA_MOCK_v1
-89,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Dec-24,79197,684.8,"54,234,105.60",30.9,18.6,Brazil,IQVIA_MOCK_v1
-90,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Feb-25,70327,364.41,"25,627,862.07",15.0,15.3,UK,IQVIA_MOCK_v1
-91,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jun-24,20552,370.45,"7,613,488.40",28.6,40.1,South Korea,IQVIA_MOCK_v1
-92,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jan-24,61431,370.52,"22,761,414.12",28.5,2.5,South Korea,IQVIA_MOCK_v1
-93,DB15462,Risdiplam,Rare Diseases,Oral Solution,Retail Pharmacy,Jul-24,37059,749.45,"27,773,867.55",10.3,13.1,USA,IQVIA_MOCK_v1
-94,DB15462,Risdiplam,Rare Diseases,Oral Solution,Export,Aug-24,44592,24.88,"1,109,448.96",32.9,-2.2,Japan,IQVIA_MOCK_v1
-95,DB15462,Risdiplam,Rare Diseases,Oral Solution,Retail Pharmacy,Feb-24,34362,289.62,"9,951,922.44",34.0,25.9,UK,IQVIA_MOCK_v1
-96,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jan-25,68215,805.88,"54,973,104.20",4.4,26.9,India,IQVIA_MOCK_v1
-97,DB15687,Tezepelumab,Respiratory,SC Injection,Government/Tender,Aug-24,12696,250.45,"3,179,713.20",16.3,1.1,India,IQVIA_MOCK_v1
-98,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Sep-24,62531,470.68,"29,432,091.08",14.0,41.8,UK,IQVIA_MOCK_v1
-99,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Jan-25,46612,597.58,"27,854,398.96",11.3,1.6,UK,IQVIA_MOCK_v1
-100,DB15687,Tezepelumab,Respiratory,SC Injection,Hospital,Apr-24,41859,102.06,"4,272,129.54",21.2,29.2,China,IQVIA_MOCK_v1
-101,DB15687,Tezepelumab,Respiratory,SC Injection,Retail Pharmacy,Mar-25,28861,627.94,"18,122,976.34",11.5,19.8,China,IQVIA_MOCK_v1
-102,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Nov-24,13676,707.82,"9,680,146.32",12.2,7.5,Brazil,IQVIA_MOCK_v1
-103,DB16100,Faricimab,Ophthalmology,Intravitreal,Hospital,May-24,73029,248.67,"18,160,121.43",36.4,22.4,India,IQVIA_MOCK_v1
-104,DB16100,Faricimab,Ophthalmology,Intravitreal,Government/Tender,Jan-24,2107,488.17,"1,028,574.19",18.7,11.8,USA,IQVIA_MOCK_v1
-105,DB16100,Faricimab,Ophthalmology,Intravitreal,Retail Pharmacy,Dec-24,33592,799.93,"26,871,248.56",19.0,32.4,India,IQVIA_MOCK_v1
-106,DB16100,Faricimab,Ophthalmology,Intravitreal,Government/Tender,Sep-24,10210,490.68,"5,009,842.80",26.8,-3.8,South Korea,IQVIA_MOCK_v1
-107,DB16100,Faricimab,Ophthalmology,Intravitreal,Export,Mar-24,11664,844.83,"9,854,097.12",5.6,29.3,Brazil,IQVIA_MOCK_v1
-108,DB16100,Faricimab,Ophthalmology,Intravitreal,Export,Mar-25,68994,323.63,"22,328,528.22",35.1,4.1,China,IQVIA_MOCK_v1
-109,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Export,Oct-24,27735,531.88,"14,751,691.80",11.1,-7.6,USA,IQVIA_MOCK_v1
-110,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Jul-24,72850,64.27,"4,682,069.50",1.3,12.3,Germany,IQVIA_MOCK_v1
-111,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Export,May-24,38675,28.23,"1,091,795.25",11.9,3.3,South Korea,IQVIA_MOCK_v1
-112,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Government/Tender,Mar-25,31095,785.36,"24,420,769.20",30.6,21.8,USA,IQVIA_MOCK_v1
-113,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Dec-24,15543,463.11,"7,198,118.73",25.4,37.1,Japan,IQVIA_MOCK_v1
-114,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Jan-24,8316,141.45,"1,176,298.20",12.7,28.4,USA,IQVIA_MOCK_v1
-115,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,Oct-24,66097,459.21,"30,352,403.37",17.5,20.3,Brazil,IQVIA_MOCK_v1
-116,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,May-24,79629,213.19,"16,976,106.51",4.6,39.9,UK,IQVIA_MOCK_v1
-117,DB16126,Belzutifan,Oncology,Oral Tablet,Export,Aug-24,35825,490.02,"17,554,966.50",29.7,-2.5,India,IQVIA_MOCK_v1
-118,DB16126,Belzutifan,Oncology,Oral Tablet,Export,Feb-24,36958,154.68,"5,716,663.44",23.0,22.3,South Korea,IQVIA_MOCK_v1
-119,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,Jan-25,62105,296.09,"18,388,669.45",13.6,24.2,USA,IQVIA_MOCK_v1
-120,DB16126,Belzutifan,Oncology,Oral Tablet,Retail Pharmacy,Feb-25,54455,589.78,"32,116,469.90",12.0,39.0,UK,IQVIA_MOCK_v1
+1,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet, PhRetailarmacy,Nov-24,13934.0,575.36,"8,017,066.24",34.5,-7.3,Germany,IQVIA_MOCK_v1
+2,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Government/Tender,Feb-24,4405.0,80.09,"352,796.45",9.9,20.5,India,IQVIA_MOCK_v1
+3,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Export,Jan-24,71926.0,356.88,"25,668,950.88",18.0,3.0,China,IQVIA_MOCK_v1
+4,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Hospital,Dec-24,55892.0,289.54,"16,182,969.68",7.0,39.7,Germany,IQVIA_MOCK_v1
+5,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Online Pharmacy,May-24,12656.0,323.25,"4,091,052.00",14.6,6.6,USA,IQVIA_MOCK_v1
+6,DB00331,Metformin,Diabetes/Metabolic,Oral Tablet,Online Pharmacy,Apr-24,60717.0,456.03,"27,688,773.51",37.5,8.4,India,IQVIA_MOCK_v1
+7,DB00619,Imatinib,Oncology,Oral Capsule,Retail Pharmacy,Sep-24,6506.0,562.24,"3,657,933.44",30.0,41.2,USA,IQVIA_MOCK_v1
+8,DB00619,Imatinib,Oncology,Oral Capsule,Retail Pharmacy,May-24,50323.0,236.64,"11,908,434.72",24.9,7.7,USA,IQVIA_MOCK_v1
+9,DB00619,Imatinib,Oncology,Oral Capsule,Online Pharmacy,Nov-24,27960.0,569.81,"15,931,887.60",27.4,24.9,UK,IQVIA_MOCK_v1
+10,DB00619,Imatinib,Oncology,Oral Capsule,Hospital,Oct-24,70510.0,619.89,"43,708,443.90",7.3,8.5,Germany,IQVIA_MOCK_v1
+11,DB00619,Imatinib,Oncology,Oral Capsule,Export,Jun-24,43004.0,716.5,"30,812,366.00",30.1,0.4,China,IQVIA_MOCK_v1
+12,DB00619,Imatinib,Oncology,Oral Capsule,Hospital,Dec-24,53081.0,227.95,"12,099,813.95",9.1,38.9,UK,IQVIA_MOCK_v1
+13,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Government/Tender,Mar-25,19226.0,225.52,"4,335,847.52",10.4,18.3,South Korea,IQVIA_MOCK_v1
+14,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Online Pharmacy,Dec-24,76984.0,339.79,"26,158,393.36",9.4,41.9,Japan,IQVIA_MOCK_v1
+15,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Jun-24,12415.0,642.54,"7,977,134.10",33.3,-3.7,South Korea,IQVIA_MOCK_v1
+16,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Retail Pharmacy,Apr-24,78672.0,54.47,"4,285,263.84",15.4,41.8,Japan,IQVIA_MOCK_v1
+17,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Nov-24,73012.0,731.73,"53,425,070.76",1.6,26.9,Brazil,IQVIA_MOCK_v1
+18,DB00203,Sildenafil,Cardiovascular,Oral Tablet,Export,Aug-24,45087.0,95.26,"4,294,987.62",17.4,12.5,Brazil,IQVIA_MOCK_v1
+19,DB01041,Thalidomide,Oncology,Oral Capsule,Hospital,Dec-24,67040.0,517.82,"34,714,652.80",6.9,29.2,Brazil,IQVIA_MOCK_v1
+20,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Mar-25,79004.0,275.87,"21,794,833.48",1.9,38.2,India,IQVIA_MOCK_v1
+21,DB01041,Thalidomide,Oncology,Oral Capsule,Online Pharmacy,May-24,8092.0,205.12,"1,659,831.04",22.4,-7.7,China,IQVIA_MOCK_v1
+22,DB01041,Thalidomide,Oncology,Oral Capsule,Government/Tender,Sep-24,70322.0,651.08,"45,785,247.76",6.0,13.7,USA,IQVIA_MOCK_v1
+23,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Mar-24,35241.0,448.76,"15,814,751.16",23.8,40.1,Germany,IQVIA_MOCK_v1
+24,DB01041,Thalidomide,Oncology,Oral Capsule,Export,Feb-25,41357.0,339.44,"14,038,220.08",26.3,8.2,China,IQVIA_MOCK_v1
+25,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Mar-25,3257.0,500.27,"1,629,379.39",9.8,-0.1,UK,IQVIA_MOCK_v1
+26,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Sep-24,30507.0,57.76,"1,762,084.32",2.4,5.8,India,IQVIA_MOCK_v1
+27,DB00877,Rapamycin,Immunology,Oral Tablet,Export,Aug-24,37000.0,568.8,"21,045,600.00",9.2,-4.9,China,IQVIA_MOCK_v1
+28,DB00877,Rapamycin,Immunology,Oral Tablet,Export,Feb-24,32350.0,667.03,"21,578,420.50",31.3,-1.7,South Korea,IQVIA_MOCK_v1
+29,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Apr-24,46938.0,360.33,"16,913,169.54",18.6,27.4,Japan,IQVIA_MOCK_v1
+30,DB00877,Rapamycin,Immunology,Oral Tablet,Hospital,Nov-24,53272.0,619.12,"32,981,760.64",31.1,-6.1,India,IQVIA_MOCK_v1
+31,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Retail Pharmacy,Apr-24,61137.0,212.71,"13,004,451.27",35.6,11.9,Brazil,IQVIA_MOCK_v1
+32,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Export,Mar-25,7130.0,554.5,"3,953,585.00",21.4,-11.2,USA,IQVIA_MOCK_v1
+33,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Hospital,Sep-24,22298.0,345.75,"7,709,533.50",19.2,34.7,China,IQVIA_MOCK_v1
+34,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Hospital,Aug-24,50172.0,2.33,"116,900.76",15.8,38.0,Germany,IQVIA_MOCK_v1
+35,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Government/Tender,Mar-24,55944.0,592.25,"33,132,834.00",28.4,30.3,Brazil,IQVIA_MOCK_v1
+36,DB00254,Doxycycline,Infectious Disease,Oral Capsule,Government/Tender,Jul-24,25390.0,252.55,"6,412,244.50",37.3,19.3,Germany,IQVIA_MOCK_v1
+37,DB00678,Losartan,Cardiovascular,Oral Tablet,Export,Sep-24,66409.0,781.52,"51,899,961.68",21.0,-8.9,South Korea,IQVIA_MOCK_v1
+38,DB00678,Losartan,Cardiovascular,Oral Tablet,Export,Jan-24,24856.0,58.71,"1,459,295.76",3.7,34.5,USA,IQVIA_MOCK_v1
+39,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Dec-24,75168.0,209.66,"15,759,722.88",23.4,21.4,USA,IQVIA_MOCK_v1
+40,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Jun-24,34679.0,174.02,"6,034,839.58",27.9,0.9,UK,IQVIA_MOCK_v1
+41,DB00678,Losartan,Cardiovascular,Oral Tablet,Government/Tender,Feb-25,39821.0,388.91,"15,486,785.11",35.9,38.5,Germany,IQVIA_MOCK_v1
+42,DB00678,Losartan,Cardiovascular,Oral Tablet,Hospital,Nov-24,74292.0,846.68,"62,901,550.56",3.9,-0.5,South Korea,IQVIA_MOCK_v1
+43,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Online Pharmacy,May-24,57933.0,708.77,"41,061,172.41",27.4,21.0,Germany,IQVIA_MOCK_v1
+44,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Export,Mar-24,73192.0,254.82,"18,650,785.44",25.9,38.7,India,IQVIA_MOCK_v1
+45,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Retail Pharmacy,Jun-24,15629.0,756.31,"11,820,368.99",28.9,-3.6,Brazil,IQVIA_MOCK_v1
+46,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Online Pharmacy,Feb-24,45442.0,173.46,"7,882,369.32",24.9,2.3,China,IQVIA_MOCK_v1
+47,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Government/Tender,Apr-24,7158.0,78.91,"564,837.78",17.0,2.9,Brazil,IQVIA_MOCK_v1
+48,DB00704,Naltrexone,CNS/Neurology,Oral Tablet,Hospital,Jan-25,17646.0,541.73,"9,559,367.58",11.0,28.0,UK,IQVIA_MOCK_v1
+49,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Hospital,Sep-24,72011.0,31.11,"2,240,262.21",15.0,17.8,Germany,IQVIA_MOCK_v1
+50,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Government/Tender,Dec-24,5982.0,262.37,"1,569,497.34",34.7,31.0,Germany,IQVIA_MOCK_v1
+51,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Hospital,Jul-24,28035.0,579.92,"16,258,057.20",26.1,7.1,UK,IQVIA_MOCK_v1
+52,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Export,Mar-25,20757.0,786.94,"16,334,513.58",10.0,-3.2,Japan,IQVIA_MOCK_v1
+53,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Retail Pharmacy,Jan-24,3748.0,152.87,"572,956.76",35.7,30.2,Japan,IQVIA_MOCK_v1
+54,DB00602,Ivermectin,Infectious Disease,Oral Tablet,Government/Tender,Feb-24,35470.0,135.74,"4,814,697.80",27.4,8.7,China,IQVIA_MOCK_v1
+55,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Jan-24,30331.0,189.87,"5,758,946.97",25.8,9.5,Brazil,IQVIA_MOCK_v1
+56,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Feb-25,37085.0,298.8,"11,080,998.00",20.2,24.7,USA,IQVIA_MOCK_v1
+57,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Export,Aug-24,4117.0,98.48,"405,442.16",37.4,-2.4,UK,IQVIA_MOCK_v1
+58,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Online Pharmacy,Apr-24,14708.0,507.29,"7,461,221.32",14.1,30.5,India,IQVIA_MOCK_v1
+59,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Government/Tender,Dec-24,50988.0,764.63,"38,986,954.44",8.3,-9.6,USA,IQVIA_MOCK_v1
+60,DB01076,Atorvastatin,Cardiovascular,Oral Tablet,Government/Tender,Jan-25,68646.0,786.78,"54,009,299.88",21.3,26.8,India,IQVIA_MOCK_v1
+61,DB00073,Rituximab,Oncology,IV Infusion,Hospital,Dec-24,41645.0,564.05,"23,489,862.25",5.8,36.6,UK,IQVIA_MOCK_v1
+62,DB00073,Rituximab,Oncology,IV Infusion,Export,Mar-25,54028.0,277.59,"14,997,632.52",27.2,17.9,Brazil,IQVIA_MOCK_v1
+63,DB00073,Rituximab,Oncology,IV Infusion,Retail Pharmacy,Nov-24,50195.0,575.88,"28,906,296.60",34.9,21.2,Japan,IQVIA_MOCK_v1
+64,DB00073,Rituximab,Oncology,IV Infusion,Online Pharmacy,Apr-24,72319.0,708.75,"51,256,091.25",12.5,-0.7,Japan,IQVIA_MOCK_v1
+65,DB00073,Rituximab,Oncology,IV Infusion,Export,Jun-24,61446.0,375.8,"23,091,406.80",26.4,15.6,UK,IQVIA_MOCK_v1
+66,DB00073,Rituximab,Oncology,IV Infusion,Retail Pharmacy,Jul-24,37696.0,438.38,"16,525,172.48",24.8,6.1,USA,IQVIA_MOCK_v1
+67,DB09037,Pembrolizumab,Oncology,IV Infusion,Retail Pharmacy,Feb-25,3701.0,39.76,"147,151.76",37.9,21.0,Germany,IQVIA_MOCK_v1
+68,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,Jan-25,54821.0,753.27,"41,295,014.67",22.7,26.8,South Korea,IQVIA_MOCK_v1
+69,DB09037,Pembrolizumab,Oncology,IV Infusion,Government/Tender,Apr-24,52883.0,207.76,"10,986,972.08",25.7,-11.7,South Korea,IQVIA_MOCK_v1
+70,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,Nov-24,29183.0,149.92,"4,375,115.36",36.9,16.0,Japan,IQVIA_MOCK_v1
+71,DB09037,Pembrolizumab,Oncology,IV Infusion,Hospital,May-24,16406.0,388.26,"6,369,793.56",31.1,24.0,China,IQVIA_MOCK_v1
+72,DB09037,Pembrolizumab,Oncology,IV Infusion,Export,Mar-25,58508.0,520.95,"30,479,742.60",28.0,15.3,UK,IQVIA_MOCK_v1
+73,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Online Pharmacy,Feb-25,36847.0,651.06,"23,989,607.82",20.6,21.8,China,IQVIA_MOCK_v1
+74,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Online Pharmacy,Sep-24,10655.0,606.66,"6,463,962.30",9.9,6.1,South Korea,IQVIA_MOCK_v1
+75,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Export,Aug-24,18636.0,128.63,"2,397,148.68",15.5,-3.7,USA,IQVIA_MOCK_v1
+76,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Retail Pharmacy,Mar-24,54877.0,346.76,"19,029,148.52",21.4,10.5,USA,IQVIA_MOCK_v1
+77,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Retail Pharmacy,Jan-25,51549.0,769.16,"39,649,428.84",23.0,25.6,Japan,IQVIA_MOCK_v1
+78,DB13928,Ozempic/Semaglutide,Diabetes/Metabolic,SC Injection,Export,Nov-24,63018.0,5.51,"347,229.18",14.3,28.7,Japan,IQVIA_MOCK_v1
+79,DB11699,Dupilumab,Immunology,SC Injection,Retail Pharmacy,Feb-25,29260.0,232.36,"6,798,853.60",19.3,9.0,South Korea,IQVIA_MOCK_v1
+80,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Mar-25,61761.0,781.65,"48,275,485.65",37.8,16.8,Germany,IQVIA_MOCK_v1
+81,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Jul-24,11503.0,546.52,"6,286,619.56",6.3,12.9,India,IQVIA_MOCK_v1
+82,DB11699,Dupilumab,Immunology,SC Injection,Hospital,Sep-24,50189.0,278.59,"13,982,153.51",18.2,6.2,Brazil,IQVIA_MOCK_v1
+83,DB11699,Dupilumab,Immunology,SC Injection,Government/Tender,Dec-24,55755.0,214.8,"11,976,174.00",4.3,-11.0,Brazil,IQVIA_MOCK_v1
+84,DB11699,Dupilumab,Immunology,SC Injection,Export,Oct-24,46370.0,190.98,"8,855,742.60",3.8,39.7,India,IQVIA_MOCK_v1
+85,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Export,Jan-24,31766.0,107.72,"3,421,833.52",26.2,18.5,Germany,IQVIA_MOCK_v1
+86,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Retail Pharmacy,Jan-25,34086.0,651.98,"22,223,390.28",7.5,20.8,South Korea,IQVIA_MOCK_v1
+87,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Mar-25,41268.0,92.33,"3,810,274.44",2.2,4.8,Germany,IQVIA_MOCK_v1
+88,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Government/Tender,Apr-24,26495.0,65.06,"1,723,764.70",27.0,21.9,Japan,IQVIA_MOCK_v1
+89,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Dec-24,79197.0,684.8,"54,234,105.60",30.9,18.6,Brazil,IQVIA_MOCK_v1
+90,DB16880,Lecanemab,CNS/Neurology,IV Infusion,Hospital,Feb-25,70327.0,364.41,"25,627,862.07",15.0,15.3,UK,IQVIA_MOCK_v1
+91,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jun-24,20552.0,370.45,"7,613,488.40",28.6,40.1,South Korea,IQVIA_MOCK_v1
+92,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jan-24,61431.0,370.52,"22,761,414.12",28.5,2.5,South Korea,IQVIA_MOCK_v1
+93,DB15462,Risdiplam,Rare Diseases,Oral Solution,Retail Pharmacy,Jul-24,37059.0,749.45,"27,773,867.55",10.3,13.1,USA,IQVIA_MOCK_v1
+94,DB15462,Risdiplam,Rare Diseases,Oral Solution,Export,Aug-24,44592.0,24.88,"1,109,448.96",32.9,-2.2,Japan,IQVIA_MOCK_v1
+95,DB15462,Risdiplam,Rare Diseases,Oral Solution,Retail Pharmacy,Feb-24,34362.0,289.62,"9,951,922.44",34.0,25.9,UK,IQVIA_MOCK_v1
+96,DB15462,Risdiplam,Rare Diseases,Oral Solution,Online Pharmacy,Jan-25,68215.0,805.88,"54,973,104.20",4.4,26.9,India,IQVIA_MOCK_v1
+97,DB15687,Tezepelumab,Respiratory,SC Injection,Government/Tender,Aug-24,12696.0,250.45,"3,179,713.20",16.3,1.1,India,IQVIA_MOCK_v1
+98,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Sep-24,62531.0,470.68,"29,432,091.08",14.0,41.8,UK,IQVIA_MOCK_v1
+99,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Jan-25,46612.0,597.58,"27,854,398.96",11.3,1.6,UK,IQVIA_MOCK_v1
+100,DB15687,Tezepelumab,Respiratory,SC Injection,Hospital,Apr-24,41859.0,102.06,"4,272,129.54",21.2,29.2,China,IQVIA_MOCK_v1
+101,DB15687,Tezepelumab,Respiratory,SC Injection,Retail Pharmacy,Mar-25,28861.0,627.94,"18,122,976.34",11.5,19.8,China,IQVIA_MOCK_v1
+102,DB15687,Tezepelumab,Respiratory,SC Injection,Export,Nov-24,13676.0,707.82,"9,680,146.32",12.2,7.5,Brazil,IQVIA_MOCK_v1
+103,DB16100,Faricimab,Ophthalmology,Intravitreal,Hospital,May-24,73029.0,248.67,"18,160,121.43",36.4,22.4,India,IQVIA_MOCK_v1
+104,DB16100,Faricimab,Ophthalmology,Intravitreal,Government/Tender,Jan-24,2107.0,488.17,"1,028,574.19",18.7,11.8,USA,IQVIA_MOCK_v1
+105,DB16100,Faricimab,Ophthalmology,Intravitreal,Retail Pharmacy,Dec-24,33592.0,799.93,"26,871,248.56",19.0,32.4,India,IQVIA_MOCK_v1
+106,DB16100,Faricimab,Ophthalmology,Intravitreal,Government/Tender,Sep-24,10210.0,490.68,"5,009,842.80",26.8,-3.8,South Korea,IQVIA_MOCK_v1
+107,DB16100,Faricimab,Ophthalmology,Intravitreal,Export,Mar-24,11664.0,844.83,"9,854,097.12",5.6,29.3,Brazil,IQVIA_MOCK_v1
+108,DB16100,Faricimab,Ophthalmology,Intravitreal,Export,Mar-25,68994.0,323.63,"22,328,528.22",35.1,4.1,China,IQVIA_MOCK_v1
+109,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Export,Oct-24,27735.0,531.88,"14,751,691.80",11.1,-7.6,USA,IQVIA_MOCK_v1
+110,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Jul-24,72850.0,64.27,"4,682,069.50",1.3,12.3,Germany,IQVIA_MOCK_v1
+111,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Export,May-24,38675.0,28.23,"1,091,795.25",11.9,3.3,South Korea,IQVIA_MOCK_v1
+112,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Government/Tender,Mar-25,31095.0,785.36,"24,420,769.20",30.6,21.8,USA,IQVIA_MOCK_v1
+113,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Dec-24,15543.0,463.11,"7,198,118.73",25.4,37.1,Japan,IQVIA_MOCK_v1
+114,DB11753,Vonoprazan,Gastroenterology,Oral Tablet,Retail Pharmacy,Jan-24,8316.0,141.45,"1,176,298.20",12.7,28.4,USA,IQVIA_MOCK_v1
+115,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,Oct-24,66097.0,459.21,"30,352,403.37",17.5,20.3,Brazil,IQVIA_MOCK_v1
+116,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,May-24,79629.0,213.19,"16,976,106.51",4.6,39.9,UK,IQVIA_MOCK_v1
+117,DB16126,Belzutifan,Oncology,Oral Tablet,Export,Aug-24,35825.0,490.02,"17,554,966.50",29.7,-2.5,India,IQVIA_MOCK_v1
+118,DB16126,Belzutifan,Oncology,Oral Tablet,Export,Feb-24,36958.0,154.68,"5,716,663.44",23.0,22.3,South Korea,IQVIA_MOCK_v1
+119,DB16126,Belzutifan,Oncology,Oral Tablet,Government/Tender,Jan-25,62105.0,296.09,"18,388,669.45",13.6,24.2,USA,IQVIA_MOCK_v1
+120,DB16126,Belzutifan,Oncology,Oral Tablet,Retail Pharmacy,Feb-25,54455.0,589.78,"32,116,469.90",12.0,39.0,UK,IQVIA_MOCK_v1
 TOTAL,,,,,,,,,"2,022,634,762.14",,,,
+122,DB00316,Paracetamol,Analgesic/Antipyretic,Oral Tablet,Pharmacy,Nov-24,95000.0,8.5,"807,500.00",22.4,3.8,Global,IQVIA_MOCK_v1
