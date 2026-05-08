@@ -1,4 +1,4 @@
-import MonoText from "../../landing/ui/MonoText"
+import MonoText from "@/components/ui/mono-text"
 
 export default function Sidebar() {
   const navItems = [

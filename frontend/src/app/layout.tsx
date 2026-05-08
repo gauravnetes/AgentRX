@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const ibmPlexSans = IBM_Plex_Sans({
+  weight: ['400', '500', '600', '700'],
   subsets: ["latin"],
+  variable: "--font-ibm-sans",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const ibmPlexMono = IBM_Plex_Mono({
+  weight: ['400', '500', '600'],
   subsets: ["latin"],
+  variable: "--font-ibm-mono",
 });
 
 export const metadata: Metadata = {
-  title: "AgentRX — Pharmaceutical Intelligence Platform",
-  description: "Multi-agent AI orchestration for pharmaceutical research, patent analysis, and market intelligence.",
+  title: "AgentRX — Mission Control",
+  description: "Decision Intelligence Platform — pharmaceutical drug repurposing via autonomous multi-agent orchestration",
 };
 
 export default function RootLayout({
@@ -23,11 +25,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col bg-black text-gray-100">
+    <html lang="en" className={`${ibmPlexSans.variable} ${ibmPlexMono.variable} dark`}>
+      <body className="min-h-screen bg-[#0D0F12] text-[#E8E9EB] font-sans antialiased overflow-hidden">
         {children}
       </body>
     </html>
