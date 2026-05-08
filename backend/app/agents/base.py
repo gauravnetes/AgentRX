@@ -47,3 +47,27 @@ class BaseAgent(abc.ABC):
     @abc.abstractmethod
     async def _run(self, input_data: Any) -> Dict[str, Any]: 
         pass 
+        
+    def _parse_json_safely(self, content: str) -> Dict[str, Any]:
+        """Safely extracts JSON from LLM response, handling markdown code blocks and formatting."""
+        import json, re
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            pass
+        
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', content, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(1))
+            except json.JSONDecodeError:
+                pass
+                
+        json_match = re.search(r'\{.*\}', content, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(0))
+            except json.JSONDecodeError:
+                pass
+                
+        return {}

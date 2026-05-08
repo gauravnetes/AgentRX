@@ -36,27 +36,43 @@ class WebIntelligenceAgent(BaseAgent):
     def __init__(self):
         super().__init__("Web Intelligence", "Pharmacodynamic Analyst", 0.0)
         
-        # Initialize the Free Gemini Model 
-        # (gemini-1.5-flash is blazingly fast and perfect for JSON extraction)
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash", 
-            temperature=0.1, 
-            api_key=settings.GOOGLE_API_KEY
-        )
+        import os 
+        from dotenv import load_dotenv
+        load_dotenv()
         
-        # Force the LLM to output our Pydantic schema
-        self.structured_llm = self.llm.with_structured_output(LLMDiscoveryOutput)
+        # Initialize the Free OpenRouter Model 
+        self.llm = ChatOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+            model="openai/gpt-oss-20b:free",
+            temperature=0.1
+        )
 
     async def _run(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         molecule = input_data.get("molecule", "Metformin")
-        self.log_status("running", f"Connecting to live PubMed API for {molecule}...")
         
+        # --- 1. Semantic Synonym Resolution ---
+        self.log_status("running", f"Resolving semantic aliases for {molecule}...")
+        synonym_prompt = f"What are the common generic names, brand names, and chemical aliases for the drug '{molecule}'? Return ONLY a comma-separated list of 3-5 names (e.g. 'Acetaminophen, Paracetamol, Tylenol, APAP'). Do not include the original name unless it's the primary name."
+        try:
+            syn_response = await self.llm.ainvoke(synonym_prompt)
+            synonyms = syn_response.content.strip()
+            # Clean up potential LLM conversational garbage
+            if "Here are" in synonyms:
+                synonyms = molecule
+        except Exception:
+            synonyms = molecule
+            
+        search_query = f"({molecule} OR {synonyms})[Title/Abstract] AND (repurposing OR off-label OR clinical trial OR mechanism)"
+        self.log_status("running", f"Connecting to PubMed API. Broadened query: {search_query[:50]}...")
+        
+        # --- 2. Broadened E-Search ---
         search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
         search_params = {
             "db": "pubmed",
-            "term": f"{molecule}[Title/Abstract] AND (mechanism of action OR pathway)",
+            "term": search_query,
             "retmode": "json",
-            "retmax": 5 # Fetching 5 papers for Gemini to read
+            "retmax": 15 # Fetching up to 15 papers for massive context
         }
         
         async with httpx.AsyncClient(follow_redirects=True) as client:
@@ -70,51 +86,78 @@ class WebIntelligenceAgent(BaseAgent):
                 self.log_status("warning", f"No live PubMed results found for {molecule}.")
                 return {"diseases_bio": []}
 
-            self.log_status("running", f"Found {len(id_list)} live papers. Fetching metadata...")
+            self.log_status("running", f"Found {len(id_list)} relevant papers. Fetching full XML abstracts...")
             
-            summary_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
-            summary_params = {
+            # --- 3. Full Abstract E-Fetch (XML Parsing) ---
+            fetch_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+            fetch_params = {
                 "db": "pubmed",
                 "id": ",".join(id_list),
-                "retmode": "json"
+                "retmode": "xml"
             }
             
-            summary_res = await client.get(summary_url, params=summary_params)
-            summary_res.raise_for_status()
-            summary_data = summary_res.json().get("result", {})
+            fetch_res = await client.get(fetch_url, params=fetch_params)
+            fetch_res.raise_for_status()
             
-        # --- 2. Compile the literature context for the LLM ---
-        literature_context = ""
-        for uid in id_list:
-            paper = summary_data.get(uid, {})
-            title = paper.get("title", "Unknown Title")
-            literature_context += f"- PMID:{uid} : {title}\n"
+            import xml.etree.ElementTree as ET
             
-        self.log_status("running", "AI reasoning over fetched literature to calculate pathway overlap...")
+            literature_context = ""
+            try:
+                root = ET.fromstring(fetch_res.text)
+                for article in root.findall(".//PubmedArticle"):
+                    pmid_el = article.find(".//PMID")
+                    title_el = article.find(".//ArticleTitle")
+                    abstract_el = article.find(".//AbstractText")
+                    
+                    pmid = pmid_el.text if pmid_el is not None else "Unknown"
+                    title = title_el.text if title_el is not None else "Unknown Title"
+                    abstract = abstract_el.text if abstract_el is not None else "No abstract available."
+                    
+                    # Some abstracts are split into multiple nodes (e.g. Background, Methods, Results)
+                    if abstract_el is None:
+                        abstract_parts = article.findall(".//AbstractText")
+                        if abstract_parts:
+                            abstract = " ".join([p.text for p in abstract_parts if p.text])
+                    
+                    literature_context += f"--- PMID:{pmid} ---\nTitle: {title}\nAbstract: {abstract}\n\n"
+                    
+            except Exception as e:
+                self.log_status("warning", f"XML parsing failed, using raw fallback: {e}")
+                literature_context = "Error retrieving abstracts."
+            
+        self.log_status("running", "AI reasoning over fetched abstracts to calculate pathway overlap...")
         
-        # --- 3. Prompt the LLM to do the heavy lifting ---
         prompt = f"""
-        You are an expert computational biologist.
-        Target Molecule: {molecule}
+        You are an expert computational biologist and pharmacologist.
+        Target Molecule: {molecule} (Synonyms: {synonyms})
 
-        Recent PubMed Literature:
+        Recent PubMed Literature Abstracts:
         {literature_context}
 
-        Based on the literature above and your parametric knowledge, identify 2 to 3 alternative diseases (excluding the primary indication) where {molecule} could potentially be repurposed.
-        For each disease:
-        1. Provide a realistic pathway overlap score (0.0 to 1.0).
-        2. Map the exact provided citations to the disease.
+        Based ONLY on the literature abstracts above and your parametric knowledge, identify 2 to 3 alternative diseases (excluding the primary indication) where {molecule} could potentially be repurposed.
+        
+        OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
+        {{
+            "candidates": [
+                {{
+                    "disease_name": "Name of disease",
+                    "pathway_overlap_score": 0.85,
+                    "reasoning": "Brief 1-sentence explanation",
+                    "citations": ["PMID:12345"]
+                }}
+            ]
+        }}
         """
         
         try:
-            # Send the prompt to Gemini and wait for the validated Pydantic object
-            llm_result = await self.structured_llm.ainvoke(prompt)
+            # Send the prompt to the LLM and parse the JSON manually
+            response = await self.llm.ainvoke(prompt)
+            llm_result = self._parse_json_safely(response.content)
             
-            # Convert the Pydantic objects back into standard dictionaries for LangGraph
-            final_diseases = [candidate.model_dump() for candidate in llm_result.candidates]
+            final_diseases = llm_result.get("candidates", [])
             
             self.log_status("done", f"AI extracted {len(final_diseases)} candidates dynamically.")
-            return {"diseases_bio": final_diseases}
+            return {"diseases_bio": final_diseases, "synonyms": synonyms}
             
         except Exception as e:
             self.log_status("error", f"AI parsing failed: {str(e)}")
@@ -258,19 +301,15 @@ class CommercialViabilityAgent(BaseAgent):
         except Exception:
             return {"total_active": 0, "phase_3_trials": 0, "complexity": "Unknown"}
 
-    def _fetch_financial_tam(self) -> str:
-        """Uses Yahoo Finance to pull live revenue from top Pharma proxies (JNJ, PFE) as a TAM baseline."""
+    async def _fetch_financial_tam(self, disease: str) -> str:
+        """Dynamically estimates the Total Addressable Market (TAM) for a specific disease using the LLM."""
         try:
-            # We use massive pharma conglomerates as a proxy for total market liquidity
-            jnj = yf.Ticker("JNJ").info.get("totalRevenue", 0)
-            pfe = yf.Ticker("PFE").info.get("totalRevenue", 0)
-            combined_revenue = (jnj + pfe) / 1_000_000_000 # Convert to Billions
-            
-            if combined_revenue > 0:
-                return f"${combined_revenue:.1f} Billion (Based on live Big Pharma proxy revenues)"
-            return "$10+ Billion (Estimated)"
+            prompt = f"You are a healthcare financial analyst. Estimate the global Total Addressable Market (TAM) for {disease} in Billions of USD. Return ONLY a realistic numeric estimate followed by 'Billion' (e.g., '$4.2 Billion'). Do not include any other text."
+            response = await self.llm.ainvoke(prompt)
+            estimate = response.content.strip()
+            return estimate if "Billion" in estimate else f"{estimate} Billion"
         except Exception:
-            return "$10+ Billion (Estimated - YF Timeout)"
+            return "$10.0 Billion (Fallback Estimate)"
 
     def _parse_json_safely(self, content: str) -> Dict[str, Any]:
         """Safely extracts JSON from LLM response, handling markdown code blocks and formatting."""
@@ -322,8 +361,8 @@ class CommercialViabilityAgent(BaseAgent):
                 trials_task = self._fetch_clinical_trials(client, disease)
                 competitors, trials = await asyncio.gather(fda_task, trials_task)
                 
-                # Fetch financial data (runs synchronously but very fast)
-                tam_estimate = self._fetch_financial_tam()
+                # Fetch dynamic financial data for the specific disease
+                tam_estimate = await self._fetch_financial_tam(disease)
 
                 # 2. The Final Synthesis (Only ONE LLM call per candidate, deeply grounded in facts)
                 prompt = f"""
@@ -367,15 +406,16 @@ class CommercialViabilityAgent(BaseAgent):
 class IQVIASupplyChainAgent(BaseAgent):
     def __init__(self):
         super().__init__("IQVIA Supply Chain", "Global Trade Analyst", 0.0)
-        from app.core.config import settings
-        from langchain_google_genai import ChatGoogleGenerativeAI
+        import os 
+        from dotenv import load_dotenv
+        load_dotenv()
         
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash", 
-            temperature=0.1, 
-            api_key=settings.GOOGLE_API_KEY
+        self.llm = ChatOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+            model="openai/gpt-oss-20b:free",
+            temperature=0.1
         )
-        self.structured_llm = self.llm.with_structured_output(SupplyChainOutput)
 
     def _query_local_datasets(self, molecule: str) -> str:
         import pandas as pd
@@ -489,24 +529,54 @@ class IQVIASupplyChainAgent(BaseAgent):
         
         self.log_status("running", f"Querying IQVIA and EXIM Data Lake for {molecule}...")
         
-        # Pull the actual data from the CSVs!
         enterprise_data = self._query_local_datasets(molecule)
         
-        prompt = f"""
-        You are a global pharma supply chain analyst. 
-        Analyze the following raw database extract for the molecule {molecule}.
-        
-        {enterprise_data}
-        
-        Based ONLY on the data provided above, extract the API availability, top exporting countries, supply chain risk, market trends, and repurposing score.
-        """
+        if "No local dataset records found" in enterprise_data or "Database integration error" in enterprise_data:
+            self.log_status("warning", f"Molecule {molecule} missing from local IQVIA CSVs. Triggering AI Generative Fallback...")
+            prompt = f"""
+            You are a global pharma supply chain analyst. 
+            The drug {molecule} is NOT in our internal IQVIA database. 
+            Based purely on your parametric knowledge of its global generic availability, manufacturing footprint, and market history:
+            Extract the API availability, top exporting countries, supply chain risk, market trends, and repurposing score.
+            APPEND THE EXACT TAG '(AI Estimated)' TO EVERY SINGLE STRING VALUE YOU RETURN to ensure complete transparency for the VC mentors.
+            
+            OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
+            {{
+                "api_availability": "High/Medium/Low",
+                "top_exporting_countries": ["Country1", "Country2"],
+                "supply_chain_risk": "Low/Medium/High",
+                "repurposing_score": 8.5,
+                "market_trend": "Brief trend summary",
+                "clinical_pipeline_status": "Brief status"
+            }}
+            """
+        else:
+            prompt = f"""
+            You are a global pharma supply chain analyst. 
+            Analyze the following raw database extract for the molecule {molecule}.
+            
+            {enterprise_data}
+            
+            Based ONLY on the data provided above, extract the API availability, top exporting countries, supply chain risk, market trends, and repurposing score.
+            
+            OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
+            {{
+                "api_availability": "High/Medium/Low",
+                "top_exporting_countries": ["Country1", "Country2"],
+                "supply_chain_risk": "Low/Medium/High",
+                "repurposing_score": 8.5,
+                "market_trend": "Brief trend summary",
+                "clinical_pipeline_status": "Brief status"
+            }}
+            """
         
         try:
             self.log_status("running", "AI correlating global trade risks and sales volume...")
-            llm_result = await self.structured_llm.ainvoke(prompt)
+            response = await self.llm.ainvoke(prompt)
+            llm_result = self._parse_json_safely(response.content)
             
             self.log_status("done", "Enterprise data analysis complete.")
-            return {"supply_chain_data": llm_result.model_dump()}
+            return {"supply_chain_data": llm_result}
             
         except Exception as e:
             self.log_status("error", f"IQVIA parsing failed: {str(e)}")

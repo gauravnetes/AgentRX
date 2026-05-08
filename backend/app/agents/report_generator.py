@@ -186,9 +186,11 @@ class PDFReportBuilder:
         ip_cleared_diseases: List[Dict[str, Any]],
         commercial_data: List[Dict[str, Any]],
         supply_chain_data: Dict[str, Any],
+        synonyms: str = "",
     ):
         self.thread_id = thread_id
         self.molecule = molecule
+        self.synonyms = synonyms
         self.narrative = narrative
         self.ip_cleared = ip_cleared_diseases
         self.commercial = commercial_data
@@ -248,6 +250,10 @@ class PDFReportBuilder:
         elements.append(HRFlowable(width="100%", thickness=2, color=COLOR_DARK, spaceAfter=8))
         elements.append(Paragraph(f"Target Molecule:<br/>{self.molecule.upper()}", s["cover_title"]))
         
+        if self.synonyms and self.synonyms != self.molecule:
+            elements.append(Paragraph(f"<b>Also Known As:</b> {self.synonyms}", s["cover_sub"]))
+            
+        elements.append(Spacer(1, 10 * mm))
         elements.append(Spacer(1, 15 * mm))
         elements.append(Paragraph(f"<b>Date:</b> {self.generated_at}", s["cover_meta"]))
         elements.append(Paragraph(f"<b>Thread ID:</b> {self.thread_id}", s["cover_meta"]))
@@ -531,10 +537,16 @@ class ReportGeneratorAgent(BaseAgent):
 
     def __init__(self):
         super().__init__("Report Generator", "Intelligence Synthesist", 0.1)
-        self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",
-            temperature=0.3,
-            api_key=settings.GOOGLE_API_KEY,
+        from langchain_openai import ChatOpenAI
+        import os 
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        self.llm = ChatOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+            model="openai/gpt-oss-20b:free",
+            temperature=0.3
         )
 
     async def _generate_executive_summary(
@@ -582,6 +594,7 @@ Do not use bullet points. Write in continuous prose.
 
     async def _run(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         molecule = input_data.get("molecule", "Unknown")
+        synonyms = input_data.get("synonyms", "")
         thread_id = input_data.get("thread_id", "unknown")
         narrative = input_data.get("narrative", {})
         ip_cleared = input_data.get("ip_cleared_diseases", [])
@@ -591,7 +604,7 @@ Do not use bullet points. Write in continuous prose.
         self.log_status("running", f"Generating intelligence report for {molecule}...")
 
         # 1. LLM-powered executive summary
-        self.log_status("running", "Asking Gemini to synthesise executive summary...")
+        self.log_status("running", "Asking AI to synthesise executive summary...")
         exec_summary = await self._generate_executive_summary(
             molecule, narrative, commercial, supply_chain
         )
@@ -606,6 +619,7 @@ Do not use bullet points. Write in continuous prose.
             ip_cleared_diseases=ip_cleared,
             commercial_data=commercial,
             supply_chain_data=supply_chain,
+            synonyms=synonyms
         )
         pdf_path = builder.build()
         self.log_status("done", f"PDF saved: {pdf_path}")
