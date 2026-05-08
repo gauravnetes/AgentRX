@@ -30,6 +30,18 @@ def _setup_theme():
         "font.family": "sans-serif",
     })
 
+def _sanitize_label(text: str) -> str:
+    """Replace any fancy unicode hyphens/dashes with standard ASCII hyphen."""
+    return (
+        str(text)
+        .replace('\u2011', '-')   # Non-breaking hyphen
+        .replace('\u2010', '-')   # Hyphen
+        .replace('\u2012', '-')   # Figure dash
+        .replace('\u2013', '-')   # En dash
+        .replace('\u2014', '-')   # Em dash
+        .replace('\u2212', '-')   # Minus sign
+    )
+
 def generate_pathway_overlap_chart(candidates: List[Dict[str, Any]]) -> io.BytesIO:
     """Generate a horizontal bar chart of pathway overlap scores."""
     _setup_theme()
@@ -38,6 +50,7 @@ def generate_pathway_overlap_chart(candidates: List[Dict[str, Any]]) -> io.Bytes
         return None
 
     df = pd.DataFrame(candidates)
+    df["disease_name"] = df["disease_name"].apply(_sanitize_label)
     df = df.sort_values(by="pathway_overlap_score", ascending=True)
 
     fig, ax = plt.subplots(figsize=(6, 3), dpi=150)
@@ -95,7 +108,7 @@ def generate_tam_chart(candidates: List[Dict[str, Any]]) -> io.BytesIO:
     for c in candidates:
         tam_val = _parse_tam(c.get("tam_estimate", "0"))
         data.append({
-            "disease_name": c.get("disease_name", "Unknown"),
+            "disease_name": _sanitize_label(c.get("disease_name", "Unknown")),
             "tam_billion": tam_val
         })
         

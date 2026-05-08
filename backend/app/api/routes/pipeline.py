@@ -43,6 +43,44 @@ class ResumeRequest(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Input Validation
+# ---------------------------------------------------------------------------
+
+class MoleculeValidator:
+    """
+    Validates that the submitted string looks like a real pharmaceutical
+    molecule / drug name before we spend 60+ seconds running the pipeline.
+    """
+    import re as _re
+    LEGAL_CHARS_RE = _re.compile(r"^[A-Za-z0-9\s\-\(\)\.,/]+$")
+    BLACKLIST = {
+        "test", "hello", "world", "asdf", "qwerty", "foo", "bar", "baz",
+        "null", "none", "undefined", "n/a", "na", "drug", "molecule",
+        "compound", "substance", "chemical", "medicine", "pill",
+    }
+    MIN_LEN = 3
+    MAX_LEN = 120
+
+    @classmethod
+    def validate(cls, molecule: str):
+        import re
+        name = molecule.strip()
+        if len(name) < cls.MIN_LEN:
+            return False, f"Molecule name is too short (minimum {cls.MIN_LEN} characters)."
+        if len(name) > cls.MAX_LEN:
+            return False, f"Molecule name is too long (maximum {cls.MAX_LEN} characters)."
+        if not cls.LEGAL_CHARS_RE.match(name):
+            return False, "Molecule name contains invalid characters. Only letters, digits, hyphens, spaces, and parentheses are allowed."
+        if re.match(r"^\d+$", name):
+            return False, "Molecule name cannot be a plain number."
+        if name.lower() in cls.BLACKLIST:
+            return False, f"'{name}' is not a recognised pharmaceutical molecule name."
+        if not re.search(r"[A-Za-z]", name):
+            return False, "Molecule name must contain at least one letter."
+        return True, ""
+
+
+# ---------------------------------------------------------------------------
 # POST /start — Launch the pipeline (Phase 1: Discovery + IP Clearance)
 # ---------------------------------------------------------------------------
 
@@ -52,11 +90,22 @@ async def start_pipeline(req: StartRequest, background_tasks: BackgroundTasks):
     Start the M2M pipeline for a target molecule in the background.
     Returns 202 Accepted with a thread_id for SSE streaming.
     """
+    # --- Gate: Validate molecule name before launching any background work ---
+    is_valid, reason = MoleculeValidator.validate(req.molecule)
+    if not is_valid:
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "error": "INVALID_MOLECULE",
+                "message": reason,
+                "submitted_value": req.molecule,
+            }
+        )
+
     thread_id = str(uuid.uuid4())
 
     try:
-        # Run in background to allow immediate SSE connection from UI
-        background_tasks.add_task(master.start_pipeline, molecule=req.molecule, thread_id=thread_id)
+        background_tasks.add_task(master.start_pipeline, molecule=req.molecule.strip(), thread_id=thread_id)
         return {
             "status": "ACCEPTED",
             "thread_id": thread_id,

@@ -41,6 +41,7 @@ try:
     from reportlab.platypus import (
         HRFlowable,
         Image,
+        KeepTogether,
         PageBreak,
         Paragraph,
         SimpleDocTemplate,
@@ -60,18 +61,21 @@ except ImportError:
 REPORTS_DIR = Path(__file__).parent.parent.parent / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Brand palette - Enterprise Grayscale
-COLOR_DARK   = colors.HexColor("#1E1E1E")   # Almost black
-COLOR_PRIMARY= colors.HexColor("#3A3A3A")   # Dark charcoal
-COLOR_LIGHT  = colors.HexColor("#F5F5F5")   # Very light gray
-COLOR_WHITE  = colors.white                  # White
-COLOR_GRAY   = colors.HexColor("#808080")   # Medium gray
-COLOR_ACCENT = colors.HexColor("#5E5E5E")   # Lighter charcoal
+# Strict black & white palette
+COLOR_BLACK  = colors.HexColor("#000000")
+COLOR_DARK   = colors.HexColor("#1A1A1A")
+COLOR_MID    = colors.HexColor("#555555")
+COLOR_GRAY   = colors.HexColor("#888888")
+COLOR_LGRAY  = colors.HexColor("#CCCCCC")
+COLOR_OFFWHT = colors.HexColor("#F5F5F5")
+COLOR_WHITE  = colors.white
 
-# Traffic light indicators (muted for enterprise)
-COLOR_GREEN  = colors.HexColor("#4A8B58")
-COLOR_RED    = colors.HexColor("#B24A4A")
-COLOR_AMBER  = colors.HexColor("#B2914A")
+# Backwards compat aliases used in FTO status colouring
+COLOR_PRIMARY = COLOR_DARK
+COLOR_LIGHT   = COLOR_OFFWHT
+COLOR_GREEN   = COLOR_DARK    # keep CLEAR badge dark
+COLOR_RED     = COLOR_MID     # keep BLOCKED badge mid-gray
+COLOR_AMBER   = COLOR_MID
 
 
 # ---------------------------------------------------------------------------
@@ -162,10 +166,29 @@ def _build_styles():
             fontSize=9,
             textColor=COLOR_DARK,
             fontName="Helvetica",
+            leading=13,
+            wordWrap="CJK",
+        ),
+        "badge": ParagraphStyle(
+            "Badge",
+            parent=base["Normal"],
+            fontSize=11,
+            textColor=COLOR_DARK,
+            fontName="Helvetica-Bold",
+            alignment=TA_CENTER,
+        ),
+        "citation_link": ParagraphStyle(
+            "CitationLink",
+            parent=base["Normal"],
+            fontSize=9,
+            textColor=COLOR_MID,
+            fontName="Helvetica",
             leading=14,
+            spaceAfter=2,
         ),
     }
     return styles
+
 
 
 # ---------------------------------------------------------------------------
@@ -186,6 +209,7 @@ class PDFReportBuilder:
         ip_cleared_diseases: List[Dict[str, Any]],
         commercial_data: List[Dict[str, Any]],
         supply_chain_data: Dict[str, Any],
+        merged_diseases: List[Dict[str, Any]],
         synonyms: str = "",
     ):
         self.thread_id = thread_id
@@ -193,6 +217,7 @@ class PDFReportBuilder:
         self.synonyms = synonyms
         self.narrative = narrative
         self.ip_cleared = ip_cleared_diseases
+        self.merged_diseases = merged_diseases
         self.commercial = commercial_data
         self.supply_chain = supply_chain_data
         self.generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
@@ -271,28 +296,47 @@ class PDFReportBuilder:
         elements: List[Any] = []
 
         elements.append(Paragraph("Visual Intelligence Dashboard", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=1.5, color=COLOR_DARK, spaceAfter=15))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
-        # 1. Repurposing Score Donut
-        score_val = float(self.supply_chain.get("repurposing_score", 0.0)) if self.supply_chain else 0.0
+        # --- Row 1: Donut (left) + FTO badge (right) in a 2-col borderless table ---
+        score_val = 0.0
+        try:
+            score_val = float(self.supply_chain.get("repurposing_score", 0.0))
+        except (TypeError, ValueError):
+            pass
         donut_buf = visualizations.generate_repurposing_score_donut(score_val)
-        if donut_buf:
-            img = Image(donut_buf, width=7 * cm, height=7 * cm)
-            elements.append(img)
-            elements.append(Spacer(1, 10 * mm))
+        n_cleared = len(self.ip_cleared)
+        n_total = len(self.merged_diseases)
+        fto_text = f"{n_cleared}/{n_total} Cleared"
 
-        # 2. Pathway Overlap Horizontal Bar
+        if donut_buf:
+            donut_img = Image(donut_buf, width=6 * cm, height=6 * cm)
+            badge_para = Paragraph(
+                f"<b>FTO Status</b><br/>{fto_text}<br/><br/>"
+                f"<b>Supply Risk</b><br/>{self.supply_chain.get('supply_chain_risk', 'N/A')}",
+                s["badge"]
+            )
+            row1 = Table([[donut_img, badge_para]], colWidths=[8 * cm, 9 * cm])
+            row1.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (1, 0), (1, 0), "CENTER")]))
+            elements.append(KeepTogether([row1, Spacer(1, 6 * mm)]))
+
+        # --- Row 2: Pathway Overlap chart ---
         overlap_buf = visualizations.generate_pathway_overlap_chart(self.ip_cleared)
         if overlap_buf:
-            img = Image(overlap_buf, width=12 * cm, height=6 * cm)
-            elements.append(img)
-            elements.append(Spacer(1, 10 * mm))
+            img = Image(overlap_buf, width=14 * cm, height=5.5 * cm)
+            elements.append(KeepTogether([
+                Paragraph("Pathway Overlap Scores", s["subsection_header"]),
+                img, Spacer(1, 4 * mm)
+            ]))
 
-        # 3. TAM Estimate Bar
+        # --- Row 3: TAM chart ---
         tam_buf = visualizations.generate_tam_chart(self.commercial)
         if tam_buf:
-            img = Image(tam_buf, width=12 * cm, height=6 * cm)
-            elements.append(img)
+            img = Image(tam_buf, width=14 * cm, height=5.5 * cm)
+            elements.append(KeepTogether([
+                Paragraph("Total Addressable Market Estimates", s["subsection_header"]),
+                img
+            ]))
 
         elements.append(PageBreak())
         return elements
@@ -323,26 +367,53 @@ class PDFReportBuilder:
             ]]
 
             for c in self.ip_cleared:
-                fto = c.get("fto_status", "—")
-                fto_color = COLOR_GREEN if fto == "CLEAR" else COLOR_RED
+                fto = c.get("fto_status", "UNKNOWN")
                 table_data.append([
                     Paragraph(c.get("disease_name", "—"), s["table_cell"]),
                     Paragraph(f"{c.get('pathway_overlap_score', 0.0):.2f}", s["table_cell"]),
-                    Paragraph(f'<font color="#{fto_color.hexval()[2:]}">{fto}</font>', s["table_cell"]),
+                    Paragraph(fto, s["table_cell"]),
                     Paragraph(str(c.get("blocking_patents", 0)), s["table_cell"]),
                 ])
 
-            t = Table(table_data, colWidths=[7 * cm, 3.5 * cm, 3 * cm, 3.5 * cm])
+            t = Table(table_data, colWidths=[7 * cm, 3 * cm, 3 * cm, 4 * cm])
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
-                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_DARK),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_OFFWHT]),
+                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_LGRAY),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (1, 0), (-1, -1), "CENTER"),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
             ]))
-            elements.append(t)
+            elements.append(KeepTogether([
+                Paragraph("IP-Cleared Candidates", s["subsection_header"]),
+                t
+            ]))
+            
+            # --- Mentor Polish: Add Clickable Citations ---
+            elements.append(Spacer(1, 6 * mm))
+            elements.append(Paragraph("Key References (PubMed)", s["subsection_header"]))
+            
+            import re
+            has_citations = False
+            for c in self.merged_diseases:
+                disease = c.get("disease_name", "Unknown")
+                citations = c.get("citations", [])
+                if citations:
+                    links = []
+                    for cite in citations:
+                        match = re.search(r'\d+', str(cite))
+                        if match:
+                            pmid = match.group(0)
+                            links.append(f'<link href="https://pubmed.ncbi.nlm.nih.gov/{pmid}/" color="blue">PMID: {pmid}</link>')
+                    
+                    if links:
+                        link_str = ", ".join(links)
+                        elements.append(Paragraph(f"<b>{disease}:</b> {link_str}", s["body"]))
+                        has_citations = True
+                        
+            if not has_citations:
+                elements.append(Paragraph("No direct PubMed citations were extracted for these candidates.", s["body"]))
 
         return elements
 
@@ -354,7 +425,7 @@ class PDFReportBuilder:
         s = self.styles
         elements: List[Any] = []
 
-        elements.append(Spacer(1, 6 * mm))
+        elements.append(PageBreak())
         elements.append(Paragraph("2. IP Whitespace Analysis", s["section_header"]))
         elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
@@ -383,40 +454,28 @@ class PDFReportBuilder:
             table_data = [[
                 Paragraph("Indication", s["table_header"]),
                 Paragraph("TAM Estimate", s["table_header"]),
-                Paragraph("Trial Complexity", s["table_header"]),
+                Paragraph("Complexity", s["table_header"]),
                 Paragraph("VC Recommendation", s["table_header"]),
             ]]
 
             for c in self.commercial:
-                complexity = c.get("trial_complexity", "—")
-                complexity_color = (
-                    COLOR_RED if complexity == "High"
-                    else COLOR_AMBER if complexity == "Medium"
-                    else COLOR_GREEN
-                )
                 table_data.append([
                     Paragraph(c.get("disease_name", "—"), s["table_cell"]),
                     Paragraph(c.get("tam_estimate", "—"), s["table_cell"]),
-                    Paragraph(
-                        f'<font color="#{complexity_color.hexval()[2:]}">{complexity}</font>',
-                        s["table_cell"]
-                    ),
-                    Paragraph(c.get("recommendation", "—")[:120] + "...", s["table_cell"]),
+                    Paragraph(str(c.get("trial_complexity", "—")), s["table_cell"]),
+                    Paragraph(c.get("recommendation", "—"), s["table_cell"]),
                 ])
 
-            t = Table(
-                table_data,
-                colWidths=[4 * cm, 3.5 * cm, 3.5 * cm, 6 * cm],
-            )
+            t = Table(table_data, colWidths=[3.5 * cm, 3 * cm, 2.5 * cm, 8 * cm])
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
-                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_DARK),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_OFFWHT]),
+                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_LGRAY),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
             ]))
-            elements.append(t)
+            elements.append(KeepTogether(t))
 
         return elements
 
@@ -439,28 +498,25 @@ class PDFReportBuilder:
         sc = self.supply_chain
         if sc:
             kv_data = [
-                ["Metric", "Value"],
-                ["API Availability", sc.get("api_availability", "—")],
-                ["Supply Chain Risk", sc.get("supply_chain_risk", "—")],
-                ["Repurposing Score", str(sc.get("repurposing_score", "—"))],
-                ["Market Trend", sc.get("market_trend", "—")],
-                ["Clinical Pipeline", sc.get("clinical_pipeline_status", "—")],
-                ["Top Exporters", ", ".join(sc.get("top_exporting_countries", []))],
+                [Paragraph("Metric", s["table_header"]), Paragraph("Value", s["table_header"])],
+                [Paragraph("API Availability", s["table_cell"]), Paragraph(sc.get("api_availability", "—"), s["table_cell"])],
+                [Paragraph("Supply Chain Risk", s["table_cell"]), Paragraph(sc.get("supply_chain_risk", "—"), s["table_cell"])],
+                [Paragraph("Repurposing Score", s["table_cell"]), Paragraph(str(sc.get("repurposing_score", "—")), s["table_cell"])],
+                [Paragraph("Market Trend", s["table_cell"]), Paragraph(sc.get("market_trend", "—"), s["table_cell"])],
+                [Paragraph("Clinical Pipeline", s["table_cell"]), Paragraph(sc.get("clinical_pipeline_status", "—"), s["table_cell"])],
+                [Paragraph("Top Exporters", s["table_cell"]), Paragraph(", ".join(sc.get("top_exporting_countries", [])), s["table_cell"])],
             ]
 
-            t = Table(kv_data, colWidths=[6 * cm, 11 * cm])
+            t = Table(kv_data, colWidths=[4 * cm, 13 * cm])
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
-                ("TEXTCOLOR", (0, 0), (-1, 0), COLOR_WHITE),
-                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTSIZE", (0, 0), (-1, 0), 10),
-                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
-                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
-                ("FONTSIZE", (0, 1), (-1, -1), 9),
-                ("TOPPADDING", (0, 0), (-1, -1), 6),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_DARK),
+                ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_OFFWHT]),
+                ("GRID", (0, 0), (-1, -1), 0.5, COLOR_LGRAY),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("TOPPADDING", (0, 0), (-1, -1), 5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
             ]))
-            elements.append(t)
+            elements.append(KeepTogether(t))
 
         return elements
 
@@ -472,7 +528,6 @@ class PDFReportBuilder:
         s = self.styles
         elements: List[Any] = []
 
-        elements.append(PageBreak())
         elements.append(Paragraph("Executive Summary", s["section_header"]))
         elements.append(HRFlowable(width="100%", thickness=2, color=COLOR_DARK, spaceAfter=10))
 
@@ -501,18 +556,17 @@ class PDFReportBuilder:
             author="AgentRX Intelligence Platform",
         )
 
-        # Assemble all sections
+        # 4-page story order:
+        # P1=Cover, P2=Exec Summary+Charts, P3=Discovery+References, P4=Commercial+Supply Chain
         story: List[Any] = []
-        story += self._build_cover()
-        story += self._build_executive_summary()
-        story += self._build_dashboard()
-        story += self._build_discovery()
-        story += self._build_ip_analysis()
-        story += self._build_commercial()
-        story += self._build_supply_chain()
+        story += self._build_cover()             # Page 1
+        story += self._build_executive_summary() # Page 2 (exec summary)
+        story += self._build_dashboard()         # Page 2 cont. / Page 3 (charts)
+        story += self._build_discovery()         # Page 3 (scientific + citations)
+        story += self._build_ip_analysis()       # Page 4 (IP Whitespace)
+        story += self._build_commercial()        # Page 4 cont. (VC table)
+        story += self._build_supply_chain()      # Page 4 cont. (supply chain grid)
 
-        # Build with page callbacks
-        # Cover page gets navy background; rest get branded header/footer
         def _on_page_dispatch(canvas, doc):
             if doc.page == 1:
                 self._on_cover_page(canvas, doc)
@@ -536,17 +590,18 @@ class ReportGeneratorAgent(BaseAgent):
     """
 
     def __init__(self):
-        super().__init__("Report Generator", "Intelligence Synthesist", 0.1)
-        from langchain_openai import ChatOpenAI
-        import os 
+        super().__init__("Report Generator", "Executive Biotech Editor", 0.1)
+        import os
         from dotenv import load_dotenv
+        from langchain_groq import ChatGroq
+        
         load_dotenv()
         
-        self.llm = ChatOpenAI(
-            api_key=os.getenv("OPENROUTER_API_KEY"),
-            base_url="https://openrouter.ai/api/v1",
-            model="openai/gpt-oss-20b:free",
-            temperature=0.3
+        # Upgrade to a massive 70B parameter model for free to prevent hallucinations
+        self.llm = ChatGroq(
+            api_key=os.getenv("GROQ_API_KEY"),
+            model_name="llama-3.3-70b-versatile",
+            temperature=0.1
         )
 
     async def _generate_executive_summary(
@@ -555,31 +610,66 @@ class ReportGeneratorAgent(BaseAgent):
         narrative: Dict[str, str],
         commercial_data: List[Dict[str, Any]],
         supply_chain: Dict[str, Any],
+        merged_diseases: List[Dict[str, Any]],
+        ip_cleared: List[Dict[str, Any]],
     ) -> str:
         """Ask Gemini to write a crisp C-suite-ready executive summary."""
         candidate_names = [c.get("disease_name", "") for c in commercial_data]
-        prompt = f"""
-You are the Chief Medical Officer of a biotech VC fund writing a 150-word executive summary for a drug repurposing intelligence report.
+        cleared_names = [c.get("disease_name", "") for c in ip_cleared]
+        all_names = [c.get("disease_name", "") for c in merged_diseases]
+        blocked_names = [n for n in all_names if n not in cleared_names]
+        
+        # Build hard-data candidate table for injection into the prompt
+        candidate_table_rows = []
+        for c in commercial_data:
+            row = (
+                f"  - {c.get('disease_name', 'Unknown')}: "
+                f"TAM={c.get('tam_estimate', 'N/A')}, "
+                f"Trial Complexity={c.get('trial_complexity', 'Unknown')}, "
+                f"Pathway Score={c.get('pathway_overlap_score', 'N/A')}"
+            )
+            candidate_table_rows.append(row)
+        candidate_table = "\n".join(candidate_table_rows) or "  None identified."
 
+        # Build unambiguous IP status block
+        if blocked_names:
+            ip_status_text = (
+                f"PATENT-BLOCKED (do NOT recommend for commercial roadmap): {', '.join(blocked_names)}\n"
+                f"IP-CLEARED (100%% commercially viable): {', '.join(cleared_names)}"
+            )
+        else:
+            ip_status_text = (
+                f"IP STATUS: ALL {len(cleared_names)} candidate(s) are 100%% IP-CLEARED. "
+                f"ZERO candidates were blocked by patents or regulatory exclusivity. "
+                f"Cleared candidates: {', '.join(cleared_names)}"
+            )
+
+        prompt = f"""You are the Chief Medical Officer of a biotech VC fund. Write a formal, data-grounded 3-paragraph executive summary (max 150 words) for a drug repurposing intelligence report.
+
+=== VERIFIED PIPELINE DATA (use ONLY this — do not supplement with external assumptions) ===
 Molecule: {molecule}
-Top Repurposing Candidates (post IP clearance): {", ".join(candidate_names) or "None identified"}
 Supply Chain Risk: {supply_chain.get("supply_chain_risk", "Unknown")}
-Repurposing Opportunity Score: {supply_chain.get("repurposing_score", "N/A")}
+Repurposing Opportunity Score: {supply_chain.get("repurposing_score", "N/A")} / 10
 Market Trend: {supply_chain.get("market_trend", "Unknown")}
 
-Discovery Narrative Summary:
-{narrative.get("discovery", "")[:300]}
+Commercially Viable Candidates:
+{candidate_table}
 
-Commercial Narrative Summary:
-{narrative.get("commercial", "")[:300]}
+{ip_status_text}
 
-Write a formal, precise 3-paragraph executive summary (150 words max). Focus on:
-1. The molecule's repurposing opportunity
-2. The strongest commercial candidate and why
-3. Supply chain readiness and recommended next steps
+Discovery Context: {narrative.get("discovery", "")[:400]}
 
-Do not use bullet points. Write in continuous prose.
-        """
+=== ABSOLUTE RULES — VIOLATION IS NOT PERMITTED ===
+1. You are STRICTLY FORBIDDEN from inventing, implying, or hallucinating regulatory roadblocks, exclusivity periods, patent blocks, or legal constraints of ANY KIND that are not explicitly listed in the PATENT-BLOCKED section above.
+2. If a candidate appears in the IP-CLEARED list, you MUST treat it as fully commercially viable. Do NOT add qualifiers like "may face regulatory hurdles" or "could be subject to exclusivity".
+3. If recommending a lower-scoring candidate over a higher one, justify this using ONLY scientific or clinical reasoning (e.g., safety profile, unmet need, faster trial pathway) — never fabricate legal constraints.
+4. Write in continuous prose. No bullet points. Maximum 150 words.
+
+=== STRUCTURE ===
+Paragraph 1: Repurposing opportunity for {molecule} and total IP-cleared candidates.
+Paragraph 2: Strongest commercial candidate with data-backed justification.
+Paragraph 3: Supply chain readiness and recommended next steps.
+"""
         try:
             response = await self.llm.ainvoke(prompt)
             return response.content.strip()
@@ -597,6 +687,7 @@ Do not use bullet points. Write in continuous prose.
         synonyms = input_data.get("synonyms", "")
         thread_id = input_data.get("thread_id", "unknown")
         narrative = input_data.get("narrative", {})
+        merged_diseases = input_data.get("merged_diseases", [])
         ip_cleared = input_data.get("ip_cleared_diseases", [])
         commercial = input_data.get("commercial_data", [])
         supply_chain = input_data.get("supply_chain_data", {})
@@ -606,7 +697,7 @@ Do not use bullet points. Write in continuous prose.
         # 1. LLM-powered executive summary
         self.log_status("running", "Asking AI to synthesise executive summary...")
         exec_summary = await self._generate_executive_summary(
-            molecule, narrative, commercial, supply_chain
+            molecule, narrative, commercial, supply_chain, merged_diseases, ip_cleared
         )
         narrative["executive_summary"] = exec_summary
 
@@ -619,6 +710,7 @@ Do not use bullet points. Write in continuous prose.
             ip_cleared_diseases=ip_cleared,
             commercial_data=commercial,
             supply_chain_data=supply_chain,
+            merged_diseases=merged_diseases,
             synonyms=synonyms
         )
         pdf_path = builder.build()

@@ -80,6 +80,7 @@ async def node_web_discovery(state: AgentRXState):
     return {
         "diseases_bio": diseases,
         "narrative": {"discovery": narrative_text},
+        "synonyms": result.get("synonyms", "")
     }
 
 # ---------------------------------------------------------------------------
@@ -219,13 +220,17 @@ async def node_generate_report(state: AgentRXState):
     telemetry.emit(tid, "Report Generator Agent", "running",
                    "Synthesising executive summary and rendering PDF...")
 
-    # Build input for the report agent
+    # Build input for the report agent — include ALL state keys needed by the PDF builder
     report_input = {
         "molecule": state.get("molecule", "Unknown"),
+        "synonyms": state.get("synonyms", ""),
         "thread_id": thread_id,
         "narrative": {k: v for k, v in state.get("narrative", {}).items()
                       if not k.startswith("__")},
+        # ip_cleared carries the fto_status + citations for cleared candidates
         "ip_cleared_diseases": state.get("ip_cleared_diseases", []),
+        # merged_diseases carries ALL candidates (including blocked) with their citations
+        "merged_diseases": state.get("merged_diseases", []),
         "commercial_data": state.get("commercial_data", []),
         "supply_chain_data": state.get("supply_chain_data", {}),
     }
