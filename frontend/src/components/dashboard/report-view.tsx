@@ -4,7 +4,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import { FileText, Download, Share2, CheckCircle, AlertTriangle } from "lucide-react";
 
-export function ReportView() {
+interface ReportViewProps {
+  insights: any;
+  threadId: string | null;
+}
+
+export function ReportView({ insights, threadId }: ReportViewProps) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -23,10 +28,15 @@ export function ReportView() {
             <Share2 className="w-4 h-4 text-[#94A3B8]" />
             Share
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 rounded bg-white hover:bg-neutral-200 text-sm font-medium text-black transition-all">
+          <a 
+            href={threadId && threadId !== 'mock-uuid-fallback' ? `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/pipeline/report/${threadId}` : '#'}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded bg-white hover:bg-neutral-200 text-sm font-medium text-black transition-all"
+          >
             <Download className="w-4 h-4" />
             Export PDF
-          </button>
+          </a>
         </div>
       </div>
 
@@ -37,17 +47,17 @@ export function ReportView() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="p-5 rounded-xl bg-black/40 border border-white/[0.08]">
             <div className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mb-2">Clinical Viability</div>
-            <div className="text-3xl font-bold text-[#10B981]">High</div>
-            <div className="text-sm text-[#64748B] mt-1">Matches 3 unlinked disease pathways</div>
+            <div className="text-3xl font-bold text-[#10B981]">{insights?.clinical_viability || "Unknown"}</div>
+            <div className="text-sm text-[#64748B] mt-1">Based on target affinities</div>
           </div>
           <div className="p-5 rounded-xl bg-black/40 border border-white/[0.08]">
             <div className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mb-2">Patent Freedom</div>
-            <div className="text-3xl font-bold text-[#F59E0B]">Moderate</div>
-            <div className="text-sm text-[#64748B] mt-1">2 conflicting active patents found</div>
+            <div className="text-3xl font-bold text-[#F59E0B]">{insights?.patent_freedom || "Unknown"}</div>
+            <div className="text-sm text-[#64748B] mt-1">Status from USPTO analysis</div>
           </div>
           <div className="p-5 rounded-xl bg-black/40 border border-white/[0.08]">
             <div className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider mb-2">Market Potential</div>
-            <div className="text-3xl font-bold text-[#F5F7FA]">$4.2B</div>
+            <div className="text-3xl font-bold text-[#F5F7FA]">${insights?.tam || "0.0"}B</div>
             <div className="text-sm text-[#64748B] mt-1">Est. TAM across indicated targets</div>
           </div>
         </div>
