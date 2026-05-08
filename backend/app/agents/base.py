@@ -21,7 +21,7 @@ class BaseAgent(abc.ABC):
             "message": message
         }
         
-        print(f"[{self.name} | {status.upper()}] {message}")
+        print(f"[{self.name} | {status.upper()}] {message}", flush=True)
         return log_payload 
     
     async def execute_with_retries(self, input_data: Any) -> Dict[str, Any]:
