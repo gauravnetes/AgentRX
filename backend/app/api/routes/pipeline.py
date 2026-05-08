@@ -16,11 +16,14 @@ import uuid
 import os
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi.responses import FileResponse, StreamingResponse
 from pydantic import BaseModel
+import json
+import asyncio
 
 from app.agents.master import MasterAgent
+from app.agents.telemetry import telemetry
 
 router = APIRouter()
 
@@ -43,38 +46,27 @@ class ResumeRequest(BaseModel):
 # POST /start — Launch the pipeline (Phase 1: Discovery + IP Clearance)
 # ---------------------------------------------------------------------------
 
-@router.post("/start")
-async def start_pipeline(req: StartRequest):
+@router.post("/start", status_code=202)
+async def start_pipeline(req: StartRequest, background_tasks: BackgroundTasks):
     """
-    Start the M2M pipeline for a target molecule.
-
-    Runs:
-      1. Web Intelligence Agent (PubMed discovery)
-      2. Data Merge
-      3. Patent Landscape Agent (FTO clearance)
-
-    Then PAUSES and waits for human approval before commercial analysis.
-
-    Returns:
-      - status: PAUSED_FOR_HUMAN
-      - thread_id: use this to resume
-      - pending_candidates: IP-cleared indications awaiting approval
-      - stage_narratives: per-stage text summaries generated so far
-      - telemetry: agent event log
+    Start the M2M pipeline for a target molecule in the background.
+    Returns 202 Accepted with a thread_id for SSE streaming.
     """
     thread_id = str(uuid.uuid4())
 
     try:
-        result = await master.start_pipeline(
-            molecule=req.molecule,
-            thread_id=thread_id,
-        )
-        return result
+        # Run in background to allow immediate SSE connection from UI
+        background_tasks.add_task(master.start_pipeline, molecule=req.molecule, thread_id=thread_id)
+        return {
+            "status": "ACCEPTED",
+            "thread_id": thread_id,
+            "message": "Pipeline initialization started in the background."
+        }
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Pipeline failed during Phase 1: {str(e)}"
+            detail=f"Failed to start pipeline: {str(e)}"
         )
 
 
@@ -82,36 +74,57 @@ async def start_pipeline(req: StartRequest):
 # POST /resume — Resume after human approval (Phase 2: Commercial + Supply Chain + Report)
 # ---------------------------------------------------------------------------
 
-@router.post("/resume")
-async def resume_pipeline(req: ResumeRequest):
+@router.post("/resume", status_code=202)
+async def resume_pipeline(req: ResumeRequest, background_tasks: BackgroundTasks):
     """
-    Resume a paused pipeline after human approval of IP-cleared candidates.
-
-    Runs:
-      4. Commercial Viability Agent (TAM, trials, competitors)
-      5. IQVIA Supply Chain Agent (EXIM trade data)
-      6. Report Generator Agent (Gemini executive summary + ReportLab PDF)
-
-    Returns:
-      - status: COMPLETED
-      - final_candidates: commercially analysed candidates
-      - supply_chain: IQVIA/EXIM supply chain data
-      - narrative: full per-stage narrative dict
-      - report_urls: {"local": "/abs/path.pdf", "download_path": "/api/pipeline/report/<id>"}
-      - telemetry: full agent event log
+    Resume a paused pipeline after human approval in the background.
+    Returns 202 Accepted. Connect to SSE stream to watch progress.
     """
     try:
-        result = await master.resume_pipeline(thread_id=req.thread_id)
-        return result
-
-    except ValueError as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        background_tasks.add_task(master.resume_pipeline, thread_id=req.thread_id)
+        return {
+            "status": "ACCEPTED",
+            "thread_id": req.thread_id,
+            "message": "Pipeline resumption started in the background."
+        }
 
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Pipeline failed during Phase 2: {str(e)}"
+            detail=f"Failed to resume pipeline: {str(e)}"
         )
+
+# ---------------------------------------------------------------------------
+# GET /stream — Server-Sent Events (SSE) for Real-Time UI
+# ---------------------------------------------------------------------------
+
+@router.get("/stream/{thread_id}")
+async def stream_telemetry(thread_id: str):
+    """
+    Server-Sent Events endpoint.
+    Frontend connects here via EventSource to receive live pipeline logs and status changes.
+    """
+    async def event_generator():
+        q = telemetry.subscribe(thread_id)
+        try:
+            # Yield historical events first to catch UI up
+            history = telemetry.get_events(thread_id)
+            for evt in history:
+                yield f"data: {json.dumps(evt)}\n\n"
+            
+            while True:
+                # Wait for new live events
+                event = await q.get()
+                yield f"data: {json.dumps(event)}\n\n"
+                
+                # Close stream automatically when pipeline finishes a phase
+                if event["agent"] == "MasterAgent" and event["status"] in ["paused", "completed", "failed"]:
+                    await asyncio.sleep(0.5) # Allow final logs to flush
+                    break
+        finally:
+            telemetry.unsubscribe(thread_id, q)
+            
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 # ---------------------------------------------------------------------------

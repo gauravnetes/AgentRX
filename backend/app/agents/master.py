@@ -18,9 +18,12 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from sqlalchemy import select
 
 from app.pipeline.graph import m2m_builder
 from app.agents.telemetry import telemetry
+from app.core.db import AsyncSessionLocal
+from app.models.report import Report
 
 logger = logging.getLogger(__name__)
 
@@ -137,6 +140,17 @@ class MasterAgent:
             "report_urls": {},
         }
 
+        # Initialize DB Record
+        async with AsyncSessionLocal() as session:
+            new_report = Report(
+                id=thread_id,
+                thread_id=thread_id,
+                molecule=molecule,
+                status="RUNNING"
+            )
+            session.add(new_report)
+            await session.commit()
+
         telemetry.emit(thread_id, "MasterAgent", "dispatching",
                        f"Pipeline started for molecule: {molecule}")
         self._announce_stages(thread_id)
@@ -158,6 +172,13 @@ class MasterAgent:
         if state_snapshot.next and "commercial_viability_screening" in state_snapshot.next:
             pending = state_snapshot.values.get("ip_cleared_diseases", [])
             narrative_so_far = state_snapshot.values.get("narrative", {})
+
+            # Update DB
+            async with AsyncSessionLocal() as session:
+                db_report = await session.get(Report, thread_id)
+                if db_report:
+                    db_report.status = "PAUSED_FOR_HUMAN"
+                    await session.commit()
 
             telemetry.emit(thread_id, "MasterAgent", "paused",
                            f"Pipeline paused at human checkpoint. {len(pending)} candidates awaiting approval.")
@@ -183,6 +204,13 @@ class MasterAgent:
         """
         config = self._config(thread_id)
 
+        # Update DB Status
+        async with AsyncSessionLocal() as session:
+            db_report = await session.get(Report, thread_id)
+            if db_report:
+                db_report.status = "RUNNING"
+                await session.commit()
+
         telemetry.emit(thread_id, "MasterAgent", "resuming",
                        "Human approval received. Resuming pipeline for Phase 2...")
 
@@ -202,11 +230,30 @@ class MasterAgent:
 
         elapsed = time.monotonic() - start_time
 
-        telemetry.emit(thread_id, "MasterAgent", "completed",
-                       f"Pipeline completed in {elapsed:.1f}s. Report generation done.")
-
         report_urls = final_state.get("report_urls", {})
         narrative = final_state.get("narrative", {})
+        final_candidates = final_state.get("commercial_data", [])
+        supply_chain = final_state.get("supply_chain_data", {})
+
+        insights = {
+            "tam": max((float("".join(c for c in str(cand.get("tam_estimate", "0")) if c.isdigit() or c == ".")) for cand in final_candidates), default=0.0) if final_candidates else 0.0,
+            "clinical_viability": "High" if final_candidates else "Low",
+            "patent_freedom": "Clear" if final_candidates else "Blocked",
+            "repurposing_score": supply_chain.get("repurposing_score", 0.0),
+            "final_candidates": final_candidates
+        }
+
+        # Update DB Record
+        async with AsyncSessionLocal() as session:
+            db_report = await session.get(Report, thread_id)
+            if db_report:
+                db_report.status = "COMPLETED"
+                db_report.insights = insights
+                db_report.pdf_path = report_urls.get("local")
+                await session.commit()
+
+        telemetry.emit(thread_id, "MasterAgent", "completed",
+                       f"Pipeline completed in {elapsed:.1f}s. Report generation done.")
 
         return {
             "status": "COMPLETED",

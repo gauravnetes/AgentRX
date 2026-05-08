@@ -27,6 +27,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from app.agents.base import BaseAgent
 from app.core.config import settings
+from app.agents import visualizations
 
 # ---------------------------------------------------------------------------
 # ReportLab imports — guarded so the app still boots if reportlab is missing
@@ -59,15 +60,18 @@ except ImportError:
 REPORTS_DIR = Path(__file__).parent.parent.parent / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Brand palette
-COLOR_NAVY   = colors.HexColor("#0D1B2A")   # type: ignore[attr-defined]
-COLOR_TEAL   = colors.HexColor("#00B4D8")   # type: ignore[attr-defined]
-COLOR_LIGHT  = colors.HexColor("#E8F4FD")   # type: ignore[attr-defined]
-COLOR_WHITE  = colors.white                  # type: ignore[attr-defined]
-COLOR_GRAY   = colors.HexColor("#6C757D")   # type: ignore[attr-defined]
-COLOR_GREEN  = colors.HexColor("#28A745")   # type: ignore[attr-defined]
-COLOR_RED    = colors.HexColor("#DC3545")   # type: ignore[attr-defined]
-COLOR_AMBER  = colors.HexColor("#FFC107")   # type: ignore[attr-defined]
+# Brand palette - Enterprise Grayscale
+COLOR_DARK   = colors.HexColor("#1E1E1E")   # Almost black
+COLOR_PRIMARY= colors.HexColor("#3A3A3A")   # Dark charcoal
+COLOR_LIGHT  = colors.HexColor("#F5F5F5")   # Very light gray
+COLOR_WHITE  = colors.white                  # White
+COLOR_GRAY   = colors.HexColor("#808080")   # Medium gray
+COLOR_ACCENT = colors.HexColor("#5E5E5E")   # Lighter charcoal
+
+# Traffic light indicators (muted for enterprise)
+COLOR_GREEN  = colors.HexColor("#4A8B58")
+COLOR_RED    = colors.HexColor("#B24A4A")
+COLOR_AMBER  = colors.HexColor("#B2914A")
 
 
 # ---------------------------------------------------------------------------
@@ -82,19 +86,20 @@ def _build_styles():
         "cover_title": ParagraphStyle(
             "CoverTitle",
             parent=base["Title"],
-            fontSize=32,
-            textColor=COLOR_WHITE,
-            spaceAfter=8,
-            alignment=TA_CENTER,
+            fontSize=36,
+            textColor=COLOR_DARK,
+            spaceAfter=12,
+            alignment=TA_LEFT,
             fontName="Helvetica-Bold",
+            leading=42,
         ),
         "cover_sub": ParagraphStyle(
             "CoverSub",
             parent=base["Normal"],
-            fontSize=14,
-            textColor=COLOR_TEAL,
-            spaceAfter=4,
-            alignment=TA_CENTER,
+            fontSize=16,
+            textColor=COLOR_PRIMARY,
+            spaceAfter=8,
+            alignment=TA_LEFT,
             fontName="Helvetica",
         ),
         "cover_meta": ParagraphStyle(
@@ -102,36 +107,36 @@ def _build_styles():
             parent=base["Normal"],
             fontSize=10,
             textColor=COLOR_GRAY,
-            spaceAfter=2,
-            alignment=TA_CENTER,
+            spaceAfter=4,
+            alignment=TA_LEFT,
             fontName="Helvetica",
+            leading=14,
         ),
         "section_header": ParagraphStyle(
             "SectionHeader",
             parent=base["Heading1"],
-            fontSize=16,
-            textColor=COLOR_NAVY,
-            spaceBefore=14,
-            spaceAfter=6,
+            fontSize=18,
+            textColor=COLOR_DARK,
+            spaceBefore=20,
+            spaceAfter=8,
             fontName="Helvetica-Bold",
-            borderPad=4,
         ),
         "subsection_header": ParagraphStyle(
             "SubsectionHeader",
             parent=base["Heading2"],
-            fontSize=12,
-            textColor=COLOR_TEAL,
-            spaceBefore=10,
-            spaceAfter=4,
+            fontSize=14,
+            textColor=COLOR_PRIMARY,
+            spaceBefore=12,
+            spaceAfter=6,
             fontName="Helvetica-Bold",
         ),
         "body": ParagraphStyle(
             "BodyText",
             parent=base["Normal"],
             fontSize=10,
-            textColor=COLOR_NAVY,
-            spaceAfter=6,
-            leading=14,
+            textColor=COLOR_DARK,
+            spaceAfter=8,
+            leading=16,
             fontName="Helvetica",
         ),
         "caption": ParagraphStyle(
@@ -139,7 +144,7 @@ def _build_styles():
             parent=base["Normal"],
             fontSize=8,
             textColor=COLOR_GRAY,
-            spaceAfter=4,
+            spaceAfter=6,
             alignment=TA_CENTER,
             fontName="Helvetica-Oblique",
         ),
@@ -154,18 +159,10 @@ def _build_styles():
         "table_cell": ParagraphStyle(
             "TableCell",
             parent=base["Normal"],
-            fontSize=8,
-            textColor=COLOR_NAVY,
+            fontSize=9,
+            textColor=COLOR_DARK,
             fontName="Helvetica",
-            leading=12,
-        ),
-        "footer": ParagraphStyle(
-            "Footer",
-            parent=base["Normal"],
-            fontSize=7,
-            textColor=COLOR_GRAY,
-            alignment=TA_CENTER,
-            fontName="Helvetica",
+            leading=14,
         ),
     }
     return styles
@@ -207,18 +204,19 @@ class PDFReportBuilder:
     def _on_page(self, canvas, doc):
         canvas.saveState()
         # Top bar
-        canvas.setFillColor(COLOR_NAVY)
-        canvas.rect(0, A4[1] - 25 * mm, A4[0], 25 * mm, fill=1, stroke=0)
-        canvas.setFont("Helvetica-Bold", 9)
+        canvas.setFillColor(COLOR_PRIMARY)
+        canvas.rect(0, A4[1] - 20 * mm, A4[0], 20 * mm, fill=1, stroke=0)
+        canvas.setFont("Helvetica-Bold", 10)
         canvas.setFillColor(COLOR_WHITE)
-        canvas.drawString(20 * mm, A4[1] - 16 * mm, "AgentRX Intelligence Platform")
+        canvas.drawString(20 * mm, A4[1] - 12 * mm, "AgentRX Intelligence Platform")
         canvas.setFont("Helvetica", 9)
-        canvas.drawRightString(A4[0] - 20 * mm, A4[1] - 16 * mm,
+        canvas.drawRightString(A4[0] - 20 * mm, A4[1] - 12 * mm,
                                f"Molecule: {self.molecule}  |  Generated: {self.generated_at}")
+        
         # Bottom bar
-        canvas.setFillColor(COLOR_NAVY)
+        canvas.setFillColor(COLOR_DARK)
         canvas.rect(0, 0, A4[0], 12 * mm, fill=1, stroke=0)
-        canvas.setFont("Helvetica", 7)
+        canvas.setFont("Helvetica", 8)
         canvas.setFillColor(COLOR_GRAY)
         canvas.drawCentredString(
             A4[0] / 2, 4 * mm,
@@ -227,13 +225,14 @@ class PDFReportBuilder:
         canvas.restoreState()
 
     def _on_cover_page(self, canvas, doc):
-        # Full navy background on cover
+        # Stark white background on cover
         canvas.saveState()
-        canvas.setFillColor(COLOR_NAVY)
+        canvas.setFillColor(COLOR_WHITE)
         canvas.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
-        # Teal accent bar at bottom
-        canvas.setFillColor(COLOR_TEAL)
-        canvas.rect(0, 0, A4[0], 8 * mm, fill=1, stroke=0)
+        
+        # Deep charcoal accent bar at bottom
+        canvas.setFillColor(COLOR_DARK)
+        canvas.rect(0, 0, A4[0], 12 * mm, fill=1, stroke=0)
         canvas.restoreState()
 
     # ------------------------------------------------------------------
@@ -244,20 +243,51 @@ class PDFReportBuilder:
         s = self.styles
         elements: List[Any] = []
 
-        elements.append(Spacer(1, 60 * mm))
-        elements.append(Paragraph("AgentRX", s["cover_title"]))
-        elements.append(Paragraph("Intelligence Report", s["cover_sub"]))
-        elements.append(Spacer(1, 8 * mm))
-        elements.append(HRFlowable(width="60%", thickness=1, color=COLOR_TEAL, spaceAfter=6))
-        elements.append(Paragraph(f"Target Molecule: <b>{self.molecule}</b>", s["cover_sub"]))
-        elements.append(Spacer(1, 6 * mm))
-        elements.append(Paragraph(f"Generated: {self.generated_at}", s["cover_meta"]))
-        elements.append(Paragraph(f"Thread ID: {self.thread_id}", s["cover_meta"]))
-        elements.append(Spacer(1, 10 * mm))
-        elements.append(Paragraph(
-            "Mechanism-to-Market (M2M) Pipeline — Powered by Multi-Agent AI Orchestration",
-            s["cover_meta"]
-        ))
+        elements.append(Spacer(1, 80 * mm))
+        elements.append(Paragraph("DECISION INTELLIGENCE REPORT", s["cover_sub"]))
+        elements.append(HRFlowable(width="100%", thickness=2, color=COLOR_DARK, spaceAfter=8))
+        elements.append(Paragraph(f"Target Molecule:<br/>{self.molecule.upper()}", s["cover_title"]))
+        
+        elements.append(Spacer(1, 15 * mm))
+        elements.append(Paragraph(f"<b>Date:</b> {self.generated_at}", s["cover_meta"]))
+        elements.append(Paragraph(f"<b>Thread ID:</b> {self.thread_id}", s["cover_meta"]))
+        elements.append(Paragraph("<b>System:</b> AgentRX Multi-Agent M2M Orchestrator", s["cover_meta"]))
+        
+        elements.append(PageBreak())
+        return elements
+
+    # ------------------------------------------------------------------
+    # Visual Dashboard Page
+    # ------------------------------------------------------------------
+
+    def _build_dashboard(self) -> List[Any]:
+        s = self.styles
+        elements: List[Any] = []
+
+        elements.append(Paragraph("Visual Intelligence Dashboard", s["section_header"]))
+        elements.append(HRFlowable(width="100%", thickness=1.5, color=COLOR_DARK, spaceAfter=15))
+
+        # 1. Repurposing Score Donut
+        score_val = float(self.supply_chain.get("repurposing_score", 0.0)) if self.supply_chain else 0.0
+        donut_buf = visualizations.generate_repurposing_score_donut(score_val)
+        if donut_buf:
+            img = Image(donut_buf, width=7 * cm, height=7 * cm)
+            elements.append(img)
+            elements.append(Spacer(1, 10 * mm))
+
+        # 2. Pathway Overlap Horizontal Bar
+        overlap_buf = visualizations.generate_pathway_overlap_chart(self.ip_cleared)
+        if overlap_buf:
+            img = Image(overlap_buf, width=12 * cm, height=6 * cm)
+            elements.append(img)
+            elements.append(Spacer(1, 10 * mm))
+
+        # 3. TAM Estimate Bar
+        tam_buf = visualizations.generate_tam_chart(self.commercial)
+        if tam_buf:
+            img = Image(tam_buf, width=12 * cm, height=6 * cm)
+            elements.append(img)
+
         elements.append(PageBreak())
         return elements
 
@@ -270,7 +300,7 @@ class PDFReportBuilder:
         elements: List[Any] = []
 
         elements.append(Paragraph("1. Drug Repurposing Discovery", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_TEAL, spaceAfter=4))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
         narrative = self.narrative.get("discovery", "No discovery narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
@@ -296,15 +326,15 @@ class PDFReportBuilder:
                     Paragraph(str(c.get("blocking_patents", 0)), s["table_cell"]),
                 ])
 
-            t = Table(table_data, colWidths=[7 * cm, 3 * cm, 3 * cm, 3 * cm])
+            t = Table(table_data, colWidths=[7 * cm, 3.5 * cm, 3 * cm, 3.5 * cm])
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
                 ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
                 ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
                 ("ALIGN", (1, 0), (-1, -1), "CENTER"),
-                ("TOPPADDING", (0, 0), (-1, -1), 5),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
             ]))
             elements.append(t)
 
@@ -320,7 +350,7 @@ class PDFReportBuilder:
 
         elements.append(Spacer(1, 6 * mm))
         elements.append(Paragraph("2. IP Whitespace Analysis", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_TEAL, spaceAfter=4))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
         narrative = self.narrative.get("ip_analysis", "No IP analysis narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
@@ -337,7 +367,7 @@ class PDFReportBuilder:
 
         elements.append(Spacer(1, 6 * mm))
         elements.append(Paragraph("3. Commercial Viability Assessment", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_TEAL, spaceAfter=4))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
         narrative = self.narrative.get("commercial", "No commercial narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
@@ -370,15 +400,15 @@ class PDFReportBuilder:
 
             t = Table(
                 table_data,
-                colWidths=[4.5 * cm, 3.5 * cm, 3.5 * cm, 5.5 * cm],
+                colWidths=[4 * cm, 3.5 * cm, 3.5 * cm, 6 * cm],
             )
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
                 ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("TOPPADDING", (0, 0), (-1, -1), 5),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
             ]))
             elements.append(t)
 
@@ -393,8 +423,8 @@ class PDFReportBuilder:
         elements: List[Any] = []
 
         elements.append(Spacer(1, 6 * mm))
-        elements.append(Paragraph("4. IQVIA / EXIM Supply Chain Intelligence", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_TEAL, spaceAfter=4))
+        elements.append(Paragraph("4. IQVIA Supply Chain Intelligence", s["section_header"]))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
 
         narrative = self.narrative.get("supply_chain", "No supply chain narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
@@ -414,15 +444,15 @@ class PDFReportBuilder:
 
             t = Table(kv_data, colWidths=[6 * cm, 11 * cm])
             t.setStyle(TableStyle([
-                ("BACKGROUND", (0, 0), (-1, 0), COLOR_NAVY),
+                ("BACKGROUND", (0, 0), (-1, 0), COLOR_PRIMARY),
                 ("TEXTCOLOR", (0, 0), (-1, 0), COLOR_WHITE),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-                ("FONTSIZE", (0, 0), (-1, 0), 9),
+                ("FONTSIZE", (0, 0), (-1, 0), 10),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_LIGHT]),
                 ("GRID", (0, 0), (-1, -1), 0.5, COLOR_GRAY),
                 ("FONTSIZE", (0, 1), (-1, -1), 9),
-                ("TOPPADDING", (0, 0), (-1, -1), 5),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
+                ("TOPPADDING", (0, 0), (-1, -1), 6),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 6),
             ]))
             elements.append(t)
 
@@ -438,7 +468,7 @@ class PDFReportBuilder:
 
         elements.append(PageBreak())
         elements.append(Paragraph("Executive Summary", s["section_header"]))
-        elements.append(HRFlowable(width="100%", thickness=2, color=COLOR_TEAL, spaceAfter=6))
+        elements.append(HRFlowable(width="100%", thickness=2, color=COLOR_DARK, spaceAfter=10))
 
         summary = self.narrative.get("executive_summary", "Executive summary not available.")
         elements.append(Paragraph(summary, s["body"]))
@@ -469,6 +499,7 @@ class PDFReportBuilder:
         story: List[Any] = []
         story += self._build_cover()
         story += self._build_executive_summary()
+        story += self._build_dashboard()
         story += self._build_discovery()
         story += self._build_ip_analysis()
         story += self._build_commercial()
