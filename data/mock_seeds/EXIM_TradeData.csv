@@ -1,0 +1,281 @@
+#,Shipment_ID,Molecule Name,HS Code,Formulation,Exporter Country,Importer Country,Shipment Month,Volume (KG),Unit Value (USD/KG),Total Value (USD),Trade Type,Mode of Transport,Port of Loading,Port of Discharge,Incoterm,Manufacturer,Customs Status,Data Source Tag
+1,EXIM-424500,Metformin,3004.90,Oral Tablet,India,South Korea,Jun-24,10161.6,288.85,"2,935,178.16",Export,Rail,JNPT Mumbai,Incheon,DAP,Hikma,Released with Bond,EXIM_MOCK_v1
+2,EXIM-269930,Metformin,3004.90,Oral Tablet,Netherlands,Switzerland,Aug-24,13564.4,236.85,"3,212,728.14",Re-export,Courier,Amsterdam Schiphol,Zurich,DDP,Mylan,Cleared,EXIM_MOCK_v1
+3,EXIM-398910,Metformin,3004.90,Oral Tablet,Switzerland,China,Jan-25,9089.7,1048.24,"9,528,187.13",Re-export,Air,Geneva,Shanghai,CPT,Teva,Cleared,EXIM_MOCK_v1
+4,EXIM-127965,Metformin,3004.90,Oral Tablet,USA,Switzerland,Mar-24,4128.2,1086.84,"4,486,692.89",Re-export,Sea,New York JFK,Zurich,DDP,Aurobindo,Cleared,EXIM_MOCK_v1
+5,EXIM-979940,Metformin,3004.90,Oral Tablet,Japan,India,Jul-24,7555,286.75,"2,166,396.25",Import,Air,Osaka Kobe,JNPT Mumbai,EXW,Sun Pharma,Under Review,EXIM_MOCK_v1
+6,EXIM-183074,Metformin,3004.90,Oral Tablet,Italy,France,Jun-24,11881.1,169.43,"2,013,014.77",Re-export,Road,Genoa,CDG Paris,DDP,Hikma,Under Review,EXIM_MOCK_v1
+7,EXIM-415779,Metformin,3004.90,Oral Tablet,India,UK,Apr-24,12532.7,660.82,"8,281,858.81",Export,Courier,Chennai Sea,Heathrow,DAP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+8,EXIM-117233,Metformin,3004.90,Oral Tablet,USA,India,Apr-24,6326.4,953.71,"6,033,550.94",Import,Rail,Houston,Delhi Air,FOB,Hikma,Cleared,EXIM_MOCK_v1
+9,EXIM-796643,Metformin,3004.90,Oral Tablet,France,Canada,Oct-24,3667,176.57,"647,482.19",Re-export,Rail,Marseille,Toronto Pearson,FOB,Aurobindo,Released with Bond,EXIM_MOCK_v1
+10,EXIM-766549,Metformin,3004.90,Oral Tablet,France,USA,Sep-24,14621.1,85.88,"1,255,660.07",Re-export,Courier,Marseille,Los Angeles,DAP,Sandoz,Cleared,EXIM_MOCK_v1
+11,EXIM-239890,Metformin,3004.90,Oral Tablet,Japan,UK,May-24,11222.4,431.73,"4,845,046.75",Re-export,Air,Tokyo Narita,Felixstowe,EXW,Hetero,Under Review,EXIM_MOCK_v1
+12,EXIM-166165,Metformin,3004.90,Oral Tablet,India,Japan,Sep-24,5111.3,773.14,"3,951,750.48",Export,Rail,JNPT Mumbai,Tokyo Narita,CPT,Hetero,Cleared,EXIM_MOCK_v1
+13,EXIM-365618,Metformin,3004.90,Oral Tablet,Italy,Switzerland,Aug-24,602.9,245.9,"148,253.11",Re-export,Sea,Genoa,Zurich,FOB,Mylan,Released with Bond,EXIM_MOCK_v1
+14,EXIM-558176,Metformin,3004.90,Oral Tablet,India,Switzerland,Nov-24,2907,431.58,"1,254,603.06",Export,Air,JNPT Mumbai,Zurich,CPT,Mylan,Released with Bond,EXIM_MOCK_v1
+15,EXIM-940064,Metformin,3004.90,Oral Tablet,Mexico,Japan,Dec-24,6624.1,1147.99,"7,604,400.56",Re-export,Road,Veracruz,Osaka Kobe,CIF,Hikma,Cleared,EXIM_MOCK_v1
+16,EXIM-443848,Imatinib,3004.90,Oral Capsule,Italy,Japan,Feb-24,6487.6,1194.14,"7,747,102.66",Re-export,Sea,Milan Malpensa,Tokyo Narita,DAP,Teva,Released with Bond,EXIM_MOCK_v1
+17,EXIM-862120,Imatinib,3004.90,Oral Capsule,France,Brazil,May-24,6716.4,862.61,"5,793,633.80",Re-export,Sea,Marseille,Santos,CPT,Teva,Cleared,EXIM_MOCK_v1
+18,EXIM-249715,Imatinib,3004.90,Oral Capsule,Switzerland,UK,Oct-24,14972.4,333.09,"4,987,156.72",Re-export,Air,Geneva,Heathrow,FOB,Teva,Cleared,EXIM_MOCK_v1
+19,EXIM-734487,Imatinib,3004.90,Oral Capsule,Switzerland,Australia,Nov-24,11730.6,46.58,"546,411.35",Re-export,Air,Zurich,Sydney,CIF,Teva,Released with Bond,EXIM_MOCK_v1
+20,EXIM-429657,Imatinib,3004.90,Oral Capsule,Germany,Italy,Aug-24,14234.9,449.56,"6,399,441.64",Re-export,Air,Frankfurt Air,Genoa,DAP,Lupin,Under Review,EXIM_MOCK_v1
+21,EXIM-912609,Imatinib,3004.90,Oral Capsule,France,Brazil,Apr-24,14409.8,35.97,"518,320.51",Re-export,Sea,CDG Paris,Sao Paulo GRU,DDP,Lupin,Cleared,EXIM_MOCK_v1
+22,EXIM-281043,Imatinib,3004.90,Oral Capsule,Brazil,Netherlands,Aug-24,3257.8,736.19,"2,398,359.78",Re-export,Rail,Santos,Amsterdam Schiphol,CIF,Cipla,Cleared,EXIM_MOCK_v1
+23,EXIM-992717,Imatinib,3004.90,Oral Capsule,Mexico,Italy,Aug-24,14959.1,973.56,"14,563,581.40",Re-export,Road,Veracruz,Genoa,CPT,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+24,EXIM-348235,Imatinib,3004.90,Oral Capsule,Germany,Netherlands,Dec-24,13913.5,767.05,"10,672,350.17",Re-export,Road,Hamburg,Rotterdam,DAP,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+25,EXIM-851759,Sildenafil,3004.90,Oral Tablet,India,Japan,Sep-24,8605.5,563.55,"4,849,629.52",Export,Courier,Chennai Sea,Osaka Kobe,CIF,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+26,EXIM-588461,Sildenafil,3004.90,Oral Tablet,Italy,South Korea,Sep-24,6191.4,494.27,"3,060,223.28",Re-export,Courier,Milan Malpensa,Busan,FOB,Teva,Under Review,EXIM_MOCK_v1
+27,EXIM-971776,Sildenafil,3004.90,Oral Tablet,France,Canada,Jun-24,1968.6,995.72,"1,960,174.39",Re-export,Courier,Marseille,Toronto Pearson,CPT,Cipla,Under Review,EXIM_MOCK_v1
+28,EXIM-765905,Sildenafil,3004.90,Oral Tablet,USA,Australia,Mar-24,4596.7,198.55,"912,674.79",Re-export,Sea,New York JFK,Sydney,EXW,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+29,EXIM-790731,Sildenafil,3004.90,Oral Tablet,Canada,Brazil,Mar-24,9394.1,739.24,"6,944,494.48",Re-export,Air,Toronto Pearson,Santos,DAP,Torrent,Under Review,EXIM_MOCK_v1
+30,EXIM-782759,Sildenafil,3004.90,Oral Tablet,Australia,Netherlands,Mar-25,9096.8,1011.82,"9,204,324.18",Re-export,Courier,Sydney,Amsterdam Schiphol,FOB,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+31,EXIM-356773,Sildenafil,3004.90,Oral Tablet,China,Switzerland,Oct-24,6278,768.59,"4,825,208.02",Re-export,Rail,Shenzhen,Zurich,CPT,Hetero,Released with Bond,EXIM_MOCK_v1
+32,EXIM-313933,Sildenafil,3004.90,Oral Tablet,Netherlands,Switzerland,Nov-24,6121.1,546.99,"3,348,180.49",Re-export,Air,Amsterdam Schiphol,Zurich,CIF,Sandoz,Cleared,EXIM_MOCK_v1
+33,EXIM-353480,Sildenafil,3004.90,Oral Tablet,UK,France,Mar-24,4723.1,863.44,"4,078,113.46",Re-export,Road,Heathrow,Marseille,DDP,Teva,Under Review,EXIM_MOCK_v1
+34,EXIM-267457,Sildenafil,3004.90,Oral Tablet,South Korea,USA,May-24,6771.5,173.35,"1,173,839.52",Re-export,Air,Busan,Los Angeles,EXW,Torrent,Cleared,EXIM_MOCK_v1
+35,EXIM-124302,Sildenafil,3004.90,Oral Tablet,Switzerland,UK,Mar-25,8686.4,378.69,"3,289,452.82",Re-export,Sea,Zurich,Felixstowe,DDP,Hikma,Cleared,EXIM_MOCK_v1
+36,EXIM-726543,Sildenafil,3004.90,Oral Tablet,USA,South Korea,Sep-24,6885.6,292.67,"2,015,208.55",Re-export,Courier,New York JFK,Busan,EXW,Sun Pharma,Cleared,EXIM_MOCK_v1
+37,EXIM-900961,Sildenafil,3004.90,Oral Tablet,Mexico,Switzerland,Nov-24,10104.2,346.47,"3,500,802.17",Re-export,Air,Veracruz,Zurich,FOB,Cipla,Cleared,EXIM_MOCK_v1
+38,EXIM-901535,Sildenafil,3004.90,Oral Tablet,Japan,UK,Jan-24,6038.7,686.49,"4,145,507.16",Re-export,Sea,Osaka Kobe,Felixstowe,EXW,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+39,EXIM-684929,Sildenafil,3004.90,Oral Tablet,Canada,Brazil,Feb-25,14836.9,818.08,"12,137,771.15",Re-export,Air,Vancouver,Sao Paulo GRU,CIF,Sandoz,Cleared,EXIM_MOCK_v1
+40,EXIM-644559,Thalidomide,3004.90,Oral Capsule,Netherlands,Germany,Apr-24,9056.8,484.66,"4,389,468.69",Re-export,Air,Amsterdam Schiphol,Frankfurt Air,FOB,Cipla,Cleared,EXIM_MOCK_v1
+41,EXIM-631958,Thalidomide,3004.90,Oral Capsule,South Korea,Germany,Oct-24,13402.3,172.04,"2,305,731.69",Re-export,Courier,Busan,Frankfurt Air,EXW,Sandoz,Under Review,EXIM_MOCK_v1
+42,EXIM-712056,Thalidomide,3004.90,Oral Capsule,Switzerland,Canada,Sep-24,7373.2,677.69,"4,996,743.91",Re-export,Rail,Geneva,Vancouver,FOB,Teva,Released with Bond,EXIM_MOCK_v1
+43,EXIM-711868,Thalidomide,3004.90,Oral Capsule,Brazil,Switzerland,Mar-25,10893.6,827.21,"9,011,294.86",Re-export,Air,Santos,Geneva,DAP,Mylan,Cleared,EXIM_MOCK_v1
+44,EXIM-119857,Thalidomide,3004.90,Oral Capsule,South Korea,Germany,Sep-24,9453.9,745.58,"7,048,638.76",Re-export,Rail,Incheon,Hamburg,CIF,Sun Pharma,Under Review,EXIM_MOCK_v1
+45,EXIM-688132,Thalidomide,3004.90,Oral Capsule,South Korea,UK,Jul-24,2313.9,830.15,"1,920,884.08",Re-export,Rail,Incheon,Heathrow,DAP,Sun Pharma,Cleared,EXIM_MOCK_v1
+46,EXIM-739711,Thalidomide,3004.90,Oral Capsule,UK,Italy,Aug-24,7905.9,379.93,"3,003,688.59",Re-export,Sea,Felixstowe,Genoa,DDP,Lupin,Released with Bond,EXIM_MOCK_v1
+47,EXIM-465746,Thalidomide,3004.90,Oral Capsule,South Korea,China,Apr-24,4221.1,361.71,"1,526,814.08",Re-export,Road,Busan,Shenzhen,EXW,Hikma,Under Review,EXIM_MOCK_v1
+48,EXIM-144109,Thalidomide,3004.90,Oral Capsule,Canada,Switzerland,Dec-24,4138.2,150.64,"623,378.45",Re-export,Courier,Toronto Pearson,Zurich,DDP,Teva,Cleared,EXIM_MOCK_v1
+49,EXIM-689318,Thalidomide,3004.90,Oral Capsule,Brazil,Netherlands,Feb-24,5228.1,533.64,"2,789,923.28",Re-export,Road,Santos,Amsterdam Schiphol,CPT,Aurobindo,Cleared,EXIM_MOCK_v1
+50,EXIM-155040,Thalidomide,3004.90,Oral Capsule,Italy,Brazil,Mar-24,1682.9,890.36,"1,498,386.84",Re-export,Sea,Milan Malpensa,Santos,CIF,Hetero,Cleared,EXIM_MOCK_v1
+51,EXIM-600641,Thalidomide,3004.90,Oral Capsule,USA,South Korea,Jun-24,10774.5,125.15,"1,348,428.68",Re-export,Sea,Houston,Busan,FOB,Sandoz,Under Review,EXIM_MOCK_v1
+52,EXIM-538184,Thalidomide,3004.90,Oral Capsule,France,China,Jan-25,14460.5,388.8,"5,622,242.40",Re-export,Air,CDG Paris,Shanghai,FOB,Lupin,Under Review,EXIM_MOCK_v1
+53,EXIM-398384,Rapamycin,3004.90,Oral Tablet,Mexico,India,Feb-25,5985.1,596.98,"3,572,985.00",Import,Road,Mexico City,Chennai Sea,FOB,Mylan,Cleared,EXIM_MOCK_v1
+54,EXIM-446747,Rapamycin,3004.90,Oral Tablet,South Korea,Italy,Sep-24,7888.6,1067.67,"8,422,421.56",Re-export,Sea,Incheon,Milan Malpensa,DAP,Mylan,Cleared,EXIM_MOCK_v1
+55,EXIM-740632,Rapamycin,3004.90,Oral Tablet,Germany,Netherlands,Aug-24,9741.9,863.72,"8,414,273.87",Re-export,Air,Hamburg,Rotterdam,CPT,Mylan,Released with Bond,EXIM_MOCK_v1
+56,EXIM-247442,Rapamycin,3004.90,Oral Tablet,Switzerland,France,Mar-25,6112.1,516.11,"3,154,515.93",Re-export,Road,Geneva,CDG Paris,FOB,Hetero,Cleared,EXIM_MOCK_v1
+57,EXIM-374258,Rapamycin,3004.90,Oral Tablet,South Korea,UK,Mar-25,3758.3,316.64,"1,190,028.11",Re-export,Sea,Busan,Heathrow,DDP,Teva,Released with Bond,EXIM_MOCK_v1
+58,EXIM-769737,Rapamycin,3004.90,Oral Tablet,France,UK,Dec-24,3582.7,803,"2,876,908.10",Re-export,Rail,Marseille,Heathrow,EXW,Sandoz,Under Review,EXIM_MOCK_v1
+59,EXIM-836038,Rapamycin,3004.90,Oral Tablet,Mexico,Brazil,Jun-24,9238.7,266.86,"2,465,439.48",Re-export,Sea,Veracruz,Sao Paulo GRU,DDP,Hikma,Under Review,EXIM_MOCK_v1
+60,EXIM-181896,Rapamycin,3004.90,Oral Tablet,Canada,South Korea,Jan-25,8085.9,798.59,"6,457,318.88",Re-export,Sea,Vancouver,Busan,CIF,Lupin,Cleared,EXIM_MOCK_v1
+61,EXIM-221886,Rapamycin,3004.90,Oral Tablet,Mexico,Australia,Feb-24,973.3,659.44,"641,832.95",Re-export,Courier,Veracruz,Melbourne,CIF,Cipla,Under Review,EXIM_MOCK_v1
+62,EXIM-578987,Rapamycin,3004.90,Oral Tablet,France,China,Dec-24,8768.1,113.68,"996,757.61",Re-export,Courier,CDG Paris,Shenzhen,DDP,Hikma,Cleared,EXIM_MOCK_v1
+63,EXIM-706403,Doxycycline,3004.90,Oral Capsule,India,Australia,Aug-24,10107.9,373.26,"3,772,874.75",Export,Air,Delhi Air,Sydney,DDP,Sun Pharma,Released with Bond,EXIM_MOCK_v1
+64,EXIM-288724,Doxycycline,3004.90,Oral Capsule,USA,India,Jul-24,5200.7,81.19,"422,244.83",Import,Air,New York JFK,Chennai Sea,FOB,Sun Pharma,Cleared,EXIM_MOCK_v1
+65,EXIM-184148,Doxycycline,3004.90,Oral Capsule,Netherlands,Germany,Jan-25,9640.8,876.5,"8,450,161.20",Re-export,Rail,Amsterdam Schiphol,Frankfurt Air,EXW,Hikma,Cleared,EXIM_MOCK_v1
+66,EXIM-863214,Doxycycline,3004.90,Oral Capsule,France,Italy,Feb-25,8112.5,785.97,"6,376,181.62",Re-export,Road,Marseille,Milan Malpensa,FOB,Lupin,Under Review,EXIM_MOCK_v1
+67,EXIM-359535,Doxycycline,3004.90,Oral Capsule,China,Mexico,Jan-24,11354.9,1174.3,"13,334,059.07",Re-export,Rail,Shenzhen,Mexico City,CPT,Lupin,Cleared,EXIM_MOCK_v1
+68,EXIM-316092,Doxycycline,3004.90,Oral Capsule,South Korea,UK,Mar-24,4171,1125.21,"4,693,250.91",Re-export,Air,Incheon,Heathrow,FOB,Torrent,Cleared,EXIM_MOCK_v1
+69,EXIM-665979,Doxycycline,3004.90,Oral Capsule,USA,Germany,Oct-24,552,719.35,"397,081.20",Re-export,Air,New York JFK,Hamburg,CIF,Sandoz,Cleared,EXIM_MOCK_v1
+70,EXIM-416422,Doxycycline,3004.90,Oral Capsule,China,Switzerland,Feb-25,11652.2,172.46,"2,009,538.41",Re-export,Road,Shenzhen,Geneva,CIF,Torrent,Released with Bond,EXIM_MOCK_v1
+71,EXIM-149161,Doxycycline,3004.90,Oral Capsule,Mexico,Germany,Nov-24,7842.7,499.2,"3,915,075.84",Re-export,Road,Veracruz,Frankfurt Air,FOB,Hetero,Under Review,EXIM_MOCK_v1
+72,EXIM-891062,Doxycycline,3004.90,Oral Capsule,UK,Italy,Nov-24,5748.3,631.73,"3,631,373.56",Re-export,Rail,Felixstowe,Milan Malpensa,DDP,Mylan,Under Review,EXIM_MOCK_v1
+73,EXIM-684357,Doxycycline,3004.90,Oral Capsule,Canada,South Korea,Apr-24,12747.6,364.38,"4,644,970.49",Re-export,Sea,Vancouver,Busan,DDP,Lupin,Cleared,EXIM_MOCK_v1
+74,EXIM-381502,Doxycycline,3004.90,Oral Capsule,Canada,Germany,Jul-24,3680.7,247.99,"912,776.79",Re-export,Air,Toronto Pearson,Hamburg,DDP,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+75,EXIM-417915,Doxycycline,3004.90,Oral Capsule,Japan,Italy,Oct-24,9063.7,1048.98,"9,507,640.03",Re-export,Sea,Tokyo Narita,Genoa,DAP,Hikma,Under Review,EXIM_MOCK_v1
+76,EXIM-350956,Doxycycline,3004.90,Oral Capsule,Mexico,India,Apr-24,14060.5,1154.68,"16,235,378.14",Import,Air,Mexico City,Chennai Sea,CPT,Aurobindo,Cleared,EXIM_MOCK_v1
+77,EXIM-203398,Doxycycline,3004.90,Oral Capsule,Canada,UK,Jan-25,4281.7,562.17,"2,407,043.29",Re-export,Road,Vancouver,Felixstowe,EXW,Teva,Released with Bond,EXIM_MOCK_v1
+78,EXIM-877259,Doxycycline,3004.90,Oral Capsule,Netherlands,Italy,Aug-24,11436.4,387.68,"4,433,663.55",Re-export,Sea,Rotterdam,Milan Malpensa,EXW,Sandoz,Released with Bond,EXIM_MOCK_v1
+79,EXIM-498290,Doxycycline,3004.90,Oral Capsule,Germany,India,May-24,8322,702.92,"5,849,700.24",Import,Rail,Frankfurt Air,JNPT Mumbai,EXW,Aurobindo,Under Review,EXIM_MOCK_v1
+80,EXIM-276405,Losartan,3004.90,Oral Tablet,Switzerland,China,Aug-24,8282.1,1132.44,"9,378,981.32",Re-export,Road,Zurich,Shenzhen,EXW,Hetero,Cleared,EXIM_MOCK_v1
+81,EXIM-957730,Losartan,3004.90,Oral Tablet,Italy,Switzerland,Jun-24,2580.5,865.77,"2,234,119.48",Re-export,Rail,Milan Malpensa,Geneva,CIF,Lupin,Cleared,EXIM_MOCK_v1
+82,EXIM-578160,Losartan,3004.90,Oral Tablet,France,India,Jan-25,145.4,169.3,"24,616.22",Import,Sea,CDG Paris,Delhi Air,FOB,Sun Pharma,Under Review,EXIM_MOCK_v1
+83,EXIM-678440,Losartan,3004.90,Oral Tablet,UK,India,Oct-24,9584,1121.01,"10,743,759.84",Import,Rail,Heathrow,Delhi Air,CPT,Sun Pharma,Cleared,EXIM_MOCK_v1
+84,EXIM-649857,Losartan,3004.90,Oral Tablet,Japan,India,Jan-24,7964.8,333.32,"2,654,827.14",Import,Road,Tokyo Narita,JNPT Mumbai,FOB,Cipla,Cleared,EXIM_MOCK_v1
+85,EXIM-581294,Losartan,3004.90,Oral Tablet,Germany,Brazil,Apr-24,9315.7,306.64,"2,856,566.25",Re-export,Road,Frankfurt Air,Sao Paulo GRU,EXW,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+86,EXIM-495490,Losartan,3004.90,Oral Tablet,Australia,China,Dec-24,3426.6,822.43,"2,818,138.64",Re-export,Air,Melbourne,Shenzhen,CPT,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+87,EXIM-653815,Losartan,3004.90,Oral Tablet,Canada,South Korea,Jan-24,9569.4,844.9,"8,085,186.06",Re-export,Air,Vancouver,Incheon,DDP,Hetero,Cleared,EXIM_MOCK_v1
+88,EXIM-393992,Losartan,3004.90,Oral Tablet,Mexico,India,Apr-24,3210.7,1042.4,"3,346,833.68",Import,Courier,Mexico City,Delhi Air,DDP,Sun Pharma,Released with Bond,EXIM_MOCK_v1
+89,EXIM-180674,Losartan,3004.90,Oral Tablet,Mexico,Canada,Oct-24,9888.7,219.33,"2,168,888.57",Re-export,Road,Mexico City,Vancouver,FOB,Torrent,Under Review,EXIM_MOCK_v1
+90,EXIM-625119,Losartan,3004.90,Oral Tablet,Brazil,Germany,Oct-24,3645.1,1002.41,"3,653,884.69",Re-export,Rail,Santos,Hamburg,CPT,Sandoz,Released with Bond,EXIM_MOCK_v1
+91,EXIM-921609,Losartan,3004.90,Oral Tablet,Italy,UK,Jan-24,1510.4,282.41,"426,552.06",Re-export,Air,Milan Malpensa,Felixstowe,EXW,Teva,Cleared,EXIM_MOCK_v1
+92,EXIM-847748,Losartan,3004.90,Oral Tablet,South Korea,Canada,Apr-24,5369.4,1129.67,"6,065,650.10",Re-export,Rail,Busan,Toronto Pearson,CIF,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+93,EXIM-195966,Losartan,3004.90,Oral Tablet,USA,Germany,May-24,2355.6,855.45,"2,015,098.02",Re-export,Sea,New York JFK,Hamburg,CPT,Teva,Cleared,EXIM_MOCK_v1
+94,EXIM-208310,Losartan,3004.90,Oral Tablet,India,UK,Aug-24,5430.8,327.37,"1,777,881.00",Export,Sea,Chennai Sea,Felixstowe,FOB,Sandoz,Under Review,EXIM_MOCK_v1
+95,EXIM-917018,Losartan,3004.90,Oral Tablet,India,Germany,Jun-24,8335.6,718.32,"5,987,628.19",Export,Road,Chennai Sea,Frankfurt Air,DDP,Mylan,Cleared,EXIM_MOCK_v1
+96,EXIM-245584,Losartan,3004.90,Oral Tablet,USA,Netherlands,Mar-25,8415.1,1191.31,"10,024,992.78",Re-export,Sea,New York JFK,Rotterdam,DAP,Hetero,Under Review,EXIM_MOCK_v1
+97,EXIM-363926,Naltrexone,3004.90,Oral Tablet,Brazil,UK,Aug-24,2231.7,204.81,"457,074.48",Re-export,Road,Santos,Felixstowe,DDP,Hikma,Released with Bond,EXIM_MOCK_v1
+98,EXIM-448354,Naltrexone,3004.90,Oral Tablet,China,Netherlands,Nov-24,7462.2,741.92,"5,536,355.42",Re-export,Rail,Shanghai,Amsterdam Schiphol,FOB,Mylan,Under Review,EXIM_MOCK_v1
+99,EXIM-602278,Naltrexone,3004.90,Oral Tablet,Switzerland,Australia,Jul-24,12070.9,398.8,"4,813,874.92",Re-export,Road,Zurich,Sydney,DDP,Mylan,Under Review,EXIM_MOCK_v1
+100,EXIM-956156,Naltrexone,3004.90,Oral Tablet,UK,Germany,Jul-24,14532.4,353.28,"5,134,006.27",Re-export,Rail,Felixstowe,Frankfurt Air,DAP,Teva,Under Review,EXIM_MOCK_v1
+101,EXIM-842776,Naltrexone,3004.90,Oral Tablet,Netherlands,Japan,Jun-24,1752.6,678.8,"1,189,664.88",Re-export,Courier,Rotterdam,Osaka Kobe,DAP,Hetero,Under Review,EXIM_MOCK_v1
+102,EXIM-364955,Naltrexone,3004.90,Oral Tablet,China,Canada,Jan-25,4405.4,832.94,"3,669,433.88",Re-export,Rail,Shenzhen,Toronto Pearson,CPT,Cipla,Cleared,EXIM_MOCK_v1
+103,EXIM-670053,Naltrexone,3004.90,Oral Tablet,France,Germany,Dec-24,6375.8,455.5,"2,904,176.90",Re-export,Rail,Marseille,Frankfurt Air,DAP,Torrent,Cleared,EXIM_MOCK_v1
+104,EXIM-274418,Naltrexone,3004.90,Oral Tablet,India,Switzerland,Jun-24,10539.4,975.69,"10,283,187.19",Export,Courier,JNPT Mumbai,Zurich,CPT,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+105,EXIM-371306,Naltrexone,3004.90,Oral Tablet,France,Australia,Jan-24,8470.1,775.81,"6,571,188.28",Re-export,Rail,CDG Paris,Sydney,EXW,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+106,EXIM-909859,Naltrexone,3004.90,Oral Tablet,China,Australia,Dec-24,7806,698.72,"5,454,208.32",Re-export,Courier,Shenzhen,Melbourne,CIF,Teva,Cleared,EXIM_MOCK_v1
+107,EXIM-221707,Naltrexone,3004.90,Oral Tablet,France,Australia,Dec-24,7532,417.24,"3,142,651.68",Re-export,Air,Marseille,Sydney,DDP,Mylan,Cleared,EXIM_MOCK_v1
+108,EXIM-559450,Naltrexone,3004.90,Oral Tablet,Switzerland,Italy,Mar-24,5257.5,414.96,"2,181,652.20",Re-export,Sea,Zurich,Milan Malpensa,DAP,Teva,Cleared,EXIM_MOCK_v1
+109,EXIM-355761,Ivermectin,3004.90,Oral Tablet,UK,USA,May-24,718,854.38,"613,444.84",Re-export,Air,Heathrow,Houston,EXW,Hetero,Cleared,EXIM_MOCK_v1
+110,EXIM-771590,Ivermectin,3004.90,Oral Tablet,Canada,Germany,Sep-24,2444,674.02,"1,647,304.88",Re-export,Rail,Toronto Pearson,Hamburg,CIF,Hetero,Cleared,EXIM_MOCK_v1
+111,EXIM-315780,Ivermectin,3004.90,Oral Tablet,France,Japan,Jul-24,486.4,738.86,"359,381.50",Re-export,Sea,CDG Paris,Tokyo Narita,DDP,Sandoz,Cleared,EXIM_MOCK_v1
+112,EXIM-579776,Ivermectin,3004.90,Oral Tablet,Brazil,Switzerland,Dec-24,12140.5,79.76,"968,326.28",Re-export,Air,Sao Paulo GRU,Geneva,DAP,Teva,Under Review,EXIM_MOCK_v1
+113,EXIM-464825,Ivermectin,3004.90,Oral Tablet,USA,UK,Nov-24,12946.4,635.62,"8,228,990.77",Re-export,Road,New York JFK,Heathrow,DAP,Torrent,Cleared,EXIM_MOCK_v1
+114,EXIM-223586,Ivermectin,3004.90,Oral Tablet,UK,Mexico,Aug-24,9279.6,977.42,"9,070,066.63",Re-export,Road,Heathrow,Veracruz,DAP,Hetero,Cleared,EXIM_MOCK_v1
+115,EXIM-543588,Ivermectin,3004.90,Oral Tablet,China,UK,Feb-24,2786.5,833.66,"2,322,993.59",Re-export,Courier,Shanghai,Felixstowe,DDP,Torrent,Cleared,EXIM_MOCK_v1
+116,EXIM-296187,Ivermectin,3004.90,Oral Tablet,Germany,Canada,Nov-24,8083.8,1103.4,"8,919,664.92",Re-export,Sea,Frankfurt Air,Toronto Pearson,DAP,Hikma,Under Review,EXIM_MOCK_v1
+117,EXIM-529008,Ivermectin,3004.90,Oral Tablet,UK,Mexico,Aug-24,9310.2,1039.3,"9,676,090.86",Re-export,Air,Felixstowe,Veracruz,DDP,Aurobindo,Under Review,EXIM_MOCK_v1
+118,EXIM-388204,Ivermectin,3004.90,Oral Tablet,France,South Korea,Jul-24,10666.6,535.4,"5,710,897.64",Re-export,Sea,Marseille,Incheon,FOB,Aurobindo,Cleared,EXIM_MOCK_v1
+119,EXIM-912764,Ivermectin,3004.90,Oral Tablet,China,Australia,May-24,2564.7,551.5,"1,414,432.05",Re-export,Rail,Shanghai,Melbourne,DAP,Torrent,Cleared,EXIM_MOCK_v1
+120,EXIM-412170,Ivermectin,3004.90,Oral Tablet,Canada,Mexico,Jun-24,8153.5,909.36,"7,414,466.76",Re-export,Rail,Toronto Pearson,Mexico City,DAP,Sandoz,Under Review,EXIM_MOCK_v1
+121,EXIM-716482,Ivermectin,3004.90,Oral Tablet,Switzerland,India,Aug-24,3979.1,1035.33,"4,119,681.60",Import,Air,Geneva,Delhi Air,DDP,Aurobindo,Cleared,EXIM_MOCK_v1
+122,EXIM-697766,Ivermectin,3004.90,Oral Tablet,Italy,UK,Feb-25,10675.8,761.16,"8,125,991.93",Re-export,Sea,Milan Malpensa,Heathrow,DAP,Aurobindo,Under Review,EXIM_MOCK_v1
+123,EXIM-886530,Ivermectin,3004.90,Oral Tablet,UK,Australia,May-24,8973,206.21,"1,850,322.33",Re-export,Road,Heathrow,Sydney,EXW,Lupin,Released with Bond,EXIM_MOCK_v1
+124,EXIM-511776,Atorvastatin,3004.90,Oral Tablet,Mexico,India,May-24,13012.4,156.63,"2,038,132.21",Import,Sea,Mexico City,Delhi Air,CIF,Teva,Under Review,EXIM_MOCK_v1
+125,EXIM-640659,Atorvastatin,3004.90,Oral Tablet,South Korea,Germany,Oct-24,9504.4,755.24,"7,178,103.06",Re-export,Rail,Incheon,Frankfurt Air,DDP,Hetero,Cleared,EXIM_MOCK_v1
+126,EXIM-991401,Atorvastatin,3004.90,Oral Tablet,Italy,Brazil,Dec-24,14048.2,446.04,"6,266,059.13",Re-export,Rail,Genoa,Sao Paulo GRU,EXW,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+127,EXIM-673896,Atorvastatin,3004.90,Oral Tablet,USA,Switzerland,Sep-24,5995.9,1161.91,"6,966,696.17",Re-export,Sea,New York JFK,Zurich,DDP,Teva,Released with Bond,EXIM_MOCK_v1
+128,EXIM-230272,Atorvastatin,3004.90,Oral Tablet,Australia,Germany,Oct-24,12793.7,947.02,"12,115,889.77",Re-export,Air,Melbourne,Hamburg,FOB,Hetero,Cleared,EXIM_MOCK_v1
+129,EXIM-387330,Atorvastatin,3004.90,Oral Tablet,Mexico,Switzerland,Mar-24,6647.2,5.81,"38,620.23",Re-export,Rail,Veracruz,Geneva,CIF,Hetero,Under Review,EXIM_MOCK_v1
+130,EXIM-550081,Atorvastatin,3004.90,Oral Tablet,USA,Italy,Jun-24,3793.3,449.35,"1,704,519.36",Re-export,Sea,New York JFK,Milan Malpensa,FOB,Hetero,Cleared,EXIM_MOCK_v1
+131,EXIM-108454,Atorvastatin,3004.90,Oral Tablet,France,USA,Dec-24,1473,260.04,"383,038.92",Re-export,Air,Marseille,Los Angeles,CIF,Lupin,Under Review,EXIM_MOCK_v1
+132,EXIM-866260,Atorvastatin,3004.90,Oral Tablet,Italy,UK,Feb-25,1852.9,1033.11,"1,914,249.52",Re-export,Sea,Genoa,Heathrow,DDP,Aurobindo,Cleared,EXIM_MOCK_v1
+133,EXIM-656278,Atorvastatin,3004.90,Oral Tablet,Netherlands,USA,Feb-24,4734.6,1057.78,"5,008,165.19",Re-export,Sea,Rotterdam,Los Angeles,DDP,Hetero,Under Review,EXIM_MOCK_v1
+134,EXIM-190898,Atorvastatin,3004.90,Oral Tablet,Australia,India,Oct-24,9767.8,530.92,"5,185,920.38",Import,Sea,Melbourne,JNPT Mumbai,CPT,Sandoz,Under Review,EXIM_MOCK_v1
+135,EXIM-390421,Atorvastatin,3004.90,Oral Tablet,Mexico,USA,Mar-24,11299.1,709.54,"8,017,163.41",Re-export,Rail,Mexico City,Los Angeles,EXW,Teva,Cleared,EXIM_MOCK_v1
+136,EXIM-642899,Atorvastatin,3004.90,Oral Tablet,France,USA,Apr-24,8323.3,722.01,"6,009,505.83",Re-export,Courier,Marseille,Los Angeles,EXW,Hetero,Cleared,EXIM_MOCK_v1
+137,EXIM-623850,Atorvastatin,3004.90,Oral Tablet,Australia,Canada,Apr-24,11230.3,358.17,"4,022,356.55",Re-export,Air,Sydney,Toronto Pearson,CIF,Sandoz,Cleared,EXIM_MOCK_v1
+138,EXIM-672896,Rituximab,3002.13,IV Infusion,Australia,USA,Sep-24,13336.4,19.42,"258,992.89",Re-export,Road,Melbourne,New York JFK,EXW,Sandoz,Under Review,EXIM_MOCK_v1
+139,EXIM-141761,Rituximab,3002.13,IV Infusion,France,Germany,Jan-25,7091.7,1184.9,"8,402,955.33",Re-export,Air,Marseille,Hamburg,FOB,Sun Pharma,Cleared,EXIM_MOCK_v1
+140,EXIM-662628,Rituximab,3002.13,IV Infusion,Mexico,India,Jan-25,5999.7,347.35,"2,083,995.80",Import,Courier,Mexico City,Delhi Air,DDP,Sandoz,Cleared,EXIM_MOCK_v1
+141,EXIM-714923,Rituximab,3002.13,IV Infusion,Canada,France,Mar-24,4198.1,375.34,"1,575,714.85",Re-export,Courier,Vancouver,Marseille,CIF,Lupin,Under Review,EXIM_MOCK_v1
+142,EXIM-190400,Rituximab,3002.13,IV Infusion,France,Switzerland,Feb-25,9765.1,773.57,"7,553,988.41",Re-export,Road,CDG Paris,Geneva,CPT,Aurobindo,Cleared,EXIM_MOCK_v1
+143,EXIM-835575,Rituximab,3002.13,IV Infusion,Mexico,Japan,Feb-24,6827.9,732.55,"5,001,778.14",Re-export,Road,Mexico City,Tokyo Narita,CPT,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+144,EXIM-868538,Rituximab,3002.13,IV Infusion,India,China,Aug-24,14297.6,629.99,"9,007,345.02",Export,Road,Delhi Air,Shenzhen,CIF,Cipla,Released with Bond,EXIM_MOCK_v1
+145,EXIM-577309,Rituximab,3002.13,IV Infusion,Mexico,USA,Jan-25,13503.5,405.34,"5,473,508.69",Re-export,Rail,Mexico City,New York JFK,EXW,Mylan,Cleared,EXIM_MOCK_v1
+146,EXIM-876764,Rituximab,3002.13,IV Infusion,Canada,UK,Jan-24,7519.2,682.43,"5,131,327.66",Re-export,Road,Toronto Pearson,Heathrow,CIF,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+147,EXIM-999138,Rituximab,3002.13,IV Infusion,Canada,India,Jan-24,12887.4,19.68,"253,624.03",Import,Air,Toronto Pearson,JNPT Mumbai,DDP,Sandoz,Released with Bond,EXIM_MOCK_v1
+148,EXIM-384434,Rituximab,3002.13,IV Infusion,India,Australia,Jan-25,13713.5,890.1,"12,206,386.35",Export,Rail,Chennai Sea,Melbourne,CIF,Aurobindo,Released with Bond,EXIM_MOCK_v1
+149,EXIM-172274,Rituximab,3002.13,IV Infusion,Switzerland,USA,Oct-24,5623.5,604.94,"3,401,880.09",Re-export,Air,Geneva,New York JFK,CIF,Lupin,Under Review,EXIM_MOCK_v1
+150,EXIM-405759,Rituximab,3002.13,IV Infusion,Mexico,South Korea,Feb-25,4270.5,1014.59,"4,332,806.59",Re-export,Road,Veracruz,Incheon,FOB,Sun Pharma,Cleared,EXIM_MOCK_v1
+151,EXIM-106687,Rituximab,3002.13,IV Infusion,Australia,Switzerland,May-24,11106.7,294.89,"3,275,254.76",Re-export,Road,Sydney,Geneva,DAP,Aurobindo,Cleared,EXIM_MOCK_v1
+152,EXIM-208998,Rituximab,3002.13,IV Infusion,Mexico,Japan,Jan-24,3533.3,418.98,"1,480,382.03",Re-export,Air,Veracruz,Osaka Kobe,EXW,Hetero,Cleared,EXIM_MOCK_v1
+153,EXIM-986575,Rituximab,3002.13,IV Infusion,China,Australia,Apr-24,6326.2,1153.62,"7,298,030.84",Re-export,Sea,Shanghai,Sydney,CPT,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+154,EXIM-178465,Rituximab,3002.13,IV Infusion,Canada,Japan,Dec-24,13438.9,552.86,"7,429,830.25",Re-export,Air,Toronto Pearson,Osaka Kobe,DAP,Lupin,Cleared,EXIM_MOCK_v1
+155,EXIM-433507,Rituximab,3002.13,IV Infusion,Australia,France,Jan-24,6553,1157.24,"7,583,393.72",Re-export,Sea,Melbourne,Marseille,EXW,Teva,Released with Bond,EXIM_MOCK_v1
+156,EXIM-588694,Pembrolizumab,3002.13,IV Infusion,Brazil,China,Feb-24,14156.1,167.65,"2,373,270.17",Re-export,Courier,Santos,Shenzhen,FOB,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+157,EXIM-194813,Pembrolizumab,3002.13,IV Infusion,UK,South Korea,Feb-24,8062.1,1157.74,"9,333,815.65",Re-export,Sea,Felixstowe,Incheon,DDP,Hikma,Released with Bond,EXIM_MOCK_v1
+158,EXIM-845702,Pembrolizumab,3002.13,IV Infusion,Germany,Switzerland,Nov-24,4598,847.12,"3,895,057.76",Re-export,Courier,Hamburg,Geneva,FOB,Teva,Under Review,EXIM_MOCK_v1
+159,EXIM-199326,Pembrolizumab,3002.13,IV Infusion,China,Japan,Jul-24,7726.2,814.23,"6,290,903.83",Re-export,Road,Shenzhen,Tokyo Narita,CIF,Sandoz,Cleared,EXIM_MOCK_v1
+160,EXIM-819622,Pembrolizumab,3002.13,IV Infusion,South Korea,USA,Jan-25,11917.5,150.14,"1,789,293.45",Re-export,Air,Busan,New York JFK,CIF,Aurobindo,Under Review,EXIM_MOCK_v1
+161,EXIM-196446,Pembrolizumab,3002.13,IV Infusion,France,Italy,Feb-24,8755.7,314.29,"2,751,828.95",Re-export,Air,Marseille,Milan Malpensa,FOB,Aurobindo,Cleared,EXIM_MOCK_v1
+162,EXIM-620226,Pembrolizumab,3002.13,IV Infusion,Mexico,Switzerland,Feb-25,12142.9,151.42,"1,838,677.92",Re-export,Rail,Veracruz,Zurich,FOB,Torrent,Under Review,EXIM_MOCK_v1
+163,EXIM-743937,Pembrolizumab,3002.13,IV Infusion,India,South Korea,Nov-24,6428.6,427.96,"2,751,183.66",Export,Sea,JNPT Mumbai,Incheon,EXW,Hikma,Released with Bond,EXIM_MOCK_v1
+164,EXIM-243902,Pembrolizumab,3002.13,IV Infusion,Australia,France,Apr-24,9726.8,601.18,"5,847,557.62",Re-export,Courier,Melbourne,Marseille,DDP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+165,EXIM-460745,Pembrolizumab,3002.13,IV Infusion,Japan,China,Nov-24,13275.6,633.35,"8,408,101.26",Re-export,Courier,Osaka Kobe,Shenzhen,FOB,Teva,Cleared,EXIM_MOCK_v1
+166,EXIM-947935,Pembrolizumab,3002.13,IV Infusion,Mexico,Australia,Sep-24,4858,328.17,"1,594,249.86",Re-export,Air,Veracruz,Sydney,EXW,Sun Pharma,Under Review,EXIM_MOCK_v1
+167,EXIM-659614,Pembrolizumab,3002.13,IV Infusion,South Korea,Australia,Jun-24,11514.3,1199.53,"13,811,748.28",Re-export,Sea,Incheon,Melbourne,FOB,Hetero,Under Review,EXIM_MOCK_v1
+168,EXIM-348041,Pembrolizumab,3002.13,IV Infusion,Switzerland,Netherlands,Mar-25,11069,918.04,"10,161,784.76",Re-export,Sea,Geneva,Rotterdam,DAP,Teva,Cleared,EXIM_MOCK_v1
+169,EXIM-977340,Pembrolizumab,3002.13,IV Infusion,Australia,UK,Jan-25,11084.7,433.75,"4,807,988.62",Re-export,Courier,Sydney,Heathrow,FOB,Torrent,Released with Bond,EXIM_MOCK_v1
+170,EXIM-652021,Pembrolizumab,3002.13,IV Infusion,Netherlands,South Korea,Sep-24,4670.3,591.07,"2,760,474.22",Re-export,Air,Rotterdam,Incheon,FOB,Torrent,Under Review,EXIM_MOCK_v1
+171,EXIM-254887,Ozempic/Semaglutide,3002.13,SC Injection,India,Japan,Mar-25,9231.3,968.7,"8,942,360.31",Export,Road,JNPT Mumbai,Tokyo Narita,CPT,Teva,Under Review,EXIM_MOCK_v1
+172,EXIM-452909,Ozempic/Semaglutide,3002.13,SC Injection,Australia,Netherlands,Mar-25,2167.7,137.55,"298,167.14",Re-export,Courier,Melbourne,Rotterdam,EXW,Teva,Cleared,EXIM_MOCK_v1
+173,EXIM-841535,Ozempic/Semaglutide,3002.13,SC Injection,Brazil,Japan,Mar-24,14639.1,880.16,"12,884,750.26",Re-export,Rail,Sao Paulo GRU,Tokyo Narita,CPT,Hetero,Cleared,EXIM_MOCK_v1
+174,EXIM-233534,Ozempic/Semaglutide,3002.13,SC Injection,Canada,Netherlands,Mar-25,13936.2,945.46,"13,176,119.65",Re-export,Sea,Vancouver,Amsterdam Schiphol,CPT,Sandoz,Under Review,EXIM_MOCK_v1
+175,EXIM-770718,Ozempic/Semaglutide,3002.13,SC Injection,Germany,Netherlands,Jan-24,14234.4,1138.69,"16,208,568.94",Re-export,Rail,Frankfurt Air,Rotterdam,DAP,Cipla,Cleared,EXIM_MOCK_v1
+176,EXIM-193035,Ozempic/Semaglutide,3002.13,SC Injection,Australia,USA,Mar-25,7468,400.75,"2,992,801.00",Re-export,Air,Sydney,Houston,CIF,Teva,Released with Bond,EXIM_MOCK_v1
+177,EXIM-467506,Ozempic/Semaglutide,3002.13,SC Injection,Switzerland,Italy,Nov-24,9604.6,1064.55,"10,224,576.93",Re-export,Rail,Geneva,Milan Malpensa,FOB,Aurobindo,Released with Bond,EXIM_MOCK_v1
+178,EXIM-497108,Ozempic/Semaglutide,3002.13,SC Injection,Brazil,Switzerland,Feb-24,10820.2,62.54,"676,695.31",Re-export,Rail,Sao Paulo GRU,Zurich,CPT,Cipla,Cleared,EXIM_MOCK_v1
+179,EXIM-938016,Ozempic/Semaglutide,3002.13,SC Injection,UK,Australia,Jul-24,1566.4,577.99,"905,363.54",Re-export,Courier,Felixstowe,Sydney,CPT,Cipla,Under Review,EXIM_MOCK_v1
+180,EXIM-867541,Ozempic/Semaglutide,3002.13,SC Injection,Switzerland,India,May-24,350.2,317.05,"111,030.91",Import,Air,Zurich,JNPT Mumbai,FOB,Cipla,Released with Bond,EXIM_MOCK_v1
+181,EXIM-736818,Ozempic/Semaglutide,3002.13,SC Injection,USA,Australia,Mar-25,14671.7,408.85,"5,998,524.55",Re-export,Courier,Houston,Sydney,DDP,Sandoz,Cleared,EXIM_MOCK_v1
+182,EXIM-349087,Ozempic/Semaglutide,3002.13,SC Injection,Mexico,Japan,Mar-24,850.7,400.66,"340,841.46",Re-export,Sea,Veracruz,Osaka Kobe,DDP,Hetero,Released with Bond,EXIM_MOCK_v1
+183,EXIM-408857,Ozempic/Semaglutide,3002.13,SC Injection,USA,India,Jul-24,8598,1008.63,"8,672,200.74",Import,Sea,New York JFK,JNPT Mumbai,FOB,Sun Pharma,Released with Bond,EXIM_MOCK_v1
+184,EXIM-596574,Ozempic/Semaglutide,3002.13,SC Injection,Switzerland,France,Nov-24,9023.2,243.61,"2,198,141.75",Re-export,Air,Zurich,CDG Paris,CIF,Hetero,Under Review,EXIM_MOCK_v1
+185,EXIM-487345,Ozempic/Semaglutide,3002.13,SC Injection,Switzerland,USA,May-24,11783.9,567.78,"6,690,662.74",Re-export,Road,Zurich,New York JFK,FOB,Cipla,Cleared,EXIM_MOCK_v1
+186,EXIM-800596,Dupilumab,3002.13,SC Injection,South Korea,India,May-24,6624.1,319.76,"2,118,122.22",Import,Road,Incheon,JNPT Mumbai,DAP,Cipla,Cleared,EXIM_MOCK_v1
+187,EXIM-700534,Dupilumab,3002.13,SC Injection,UK,Switzerland,Sep-24,6239.1,908.97,"5,671,154.73",Re-export,Sea,Felixstowe,Zurich,DAP,Sandoz,Cleared,EXIM_MOCK_v1
+188,EXIM-275284,Dupilumab,3002.13,SC Injection,Mexico,China,Aug-24,4517.8,476.79,"2,154,041.86",Re-export,Air,Veracruz,Shanghai,DAP,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+189,EXIM-862422,Dupilumab,3002.13,SC Injection,China,Switzerland,Apr-24,1936.5,510.93,"989,415.95",Re-export,Rail,Shenzhen,Zurich,CIF,Torrent,Under Review,EXIM_MOCK_v1
+190,EXIM-924758,Dupilumab,3002.13,SC Injection,Mexico,Netherlands,Feb-24,1351.1,669.86,"905,047.85",Re-export,Courier,Veracruz,Rotterdam,EXW,Lupin,Released with Bond,EXIM_MOCK_v1
+191,EXIM-690016,Dupilumab,3002.13,SC Injection,Italy,Australia,Oct-24,7862.3,506.41,"3,981,547.34",Re-export,Rail,Milan Malpensa,Sydney,CIF,Torrent,Under Review,EXIM_MOCK_v1
+192,EXIM-738543,Dupilumab,3002.13,SC Injection,Netherlands,USA,Jan-25,4327.1,645.08,"2,791,325.67",Re-export,Road,Amsterdam Schiphol,Houston,DDP,Sandoz,Released with Bond,EXIM_MOCK_v1
+193,EXIM-824056,Dupilumab,3002.13,SC Injection,South Korea,India,Mar-24,4167.4,176.9,"737,213.06",Import,Courier,Busan,Chennai Sea,CPT,Sun Pharma,Cleared,EXIM_MOCK_v1
+194,EXIM-983788,Dupilumab,3002.13,SC Injection,China,India,Dec-24,7154.5,325.96,"2,332,080.82",Import,Road,Shenzhen,Chennai Sea,FOB,Mylan,Released with Bond,EXIM_MOCK_v1
+195,EXIM-864201,Dupilumab,3002.13,SC Injection,South Korea,Mexico,Dec-24,10288.5,1167.13,"12,008,017.01",Re-export,Sea,Busan,Veracruz,CIF,Hikma,Released with Bond,EXIM_MOCK_v1
+196,EXIM-640299,Lecanemab,3002.13,IV Infusion,Australia,Italy,Feb-24,2859.6,257.61,"736,661.56",Re-export,Rail,Melbourne,Milan Malpensa,CPT,Lupin,Cleared,EXIM_MOCK_v1
+197,EXIM-977633,Lecanemab,3002.13,IV Infusion,Netherlands,Germany,Feb-24,4701.3,610.62,"2,870,707.81",Re-export,Sea,Rotterdam,Hamburg,DAP,Cipla,Cleared,EXIM_MOCK_v1
+198,EXIM-766275,Lecanemab,3002.13,IV Infusion,India,Brazil,Jan-24,6873.9,1102.05,"7,575,381.49",Export,Sea,Delhi Air,Sao Paulo GRU,EXW,Hikma,Released with Bond,EXIM_MOCK_v1
+199,EXIM-271456,Lecanemab,3002.13,IV Infusion,Mexico,USA,Nov-24,506.9,450.1,"228,155.69",Re-export,Courier,Veracruz,New York JFK,DDP,Hikma,Under Review,EXIM_MOCK_v1
+200,EXIM-778827,Lecanemab,3002.13,IV Infusion,Switzerland,Brazil,Dec-24,12471.5,113.02,"1,409,528.93",Re-export,Air,Geneva,Santos,DDP,Cipla,Cleared,EXIM_MOCK_v1
+201,EXIM-730343,Lecanemab,3002.13,IV Infusion,China,Italy,Apr-24,4072.8,494.36,"2,013,429.41",Re-export,Air,Shanghai,Milan Malpensa,CPT,Hikma,Cleared,EXIM_MOCK_v1
+202,EXIM-581294,Lecanemab,3002.13,IV Infusion,Netherlands,India,Apr-24,3823.2,967.08,"3,697,340.26",Import,Road,Amsterdam Schiphol,Chennai Sea,CPT,Sandoz,Released with Bond,EXIM_MOCK_v1
+203,EXIM-412974,Lecanemab,3002.13,IV Infusion,Brazil,China,Aug-24,4567.1,627.16,"2,864,302.44",Re-export,Courier,Sao Paulo GRU,Shenzhen,DDP,Sun Pharma,Cleared,EXIM_MOCK_v1
+204,EXIM-257212,Lecanemab,3002.13,IV Infusion,France,USA,Aug-24,1004.4,1186.09,"1,191,308.80",Re-export,Road,Marseille,Los Angeles,EXW,Hetero,Released with Bond,EXIM_MOCK_v1
+205,EXIM-787237,Lecanemab,3002.13,IV Infusion,Canada,Switzerland,Apr-24,13500.3,967.49,"13,061,405.25",Re-export,Courier,Toronto Pearson,Geneva,DDP,Hetero,Released with Bond,EXIM_MOCK_v1
+206,EXIM-804505,Lecanemab,3002.13,IV Infusion,South Korea,Brazil,May-24,13608.3,488.5,"6,647,654.55",Re-export,Air,Incheon,Sao Paulo GRU,DAP,Teva,Under Review,EXIM_MOCK_v1
+207,EXIM-876909,Lecanemab,3002.13,IV Infusion,UK,Australia,May-24,12689,1009.56,"12,810,306.84",Re-export,Courier,Felixstowe,Sydney,CIF,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+208,EXIM-880360,Lecanemab,3002.13,IV Infusion,Brazil,Netherlands,Jan-25,8407.5,1095.59,"9,211,172.92",Re-export,Road,Sao Paulo GRU,Rotterdam,CPT,Aurobindo,Cleared,EXIM_MOCK_v1
+209,EXIM-156284,Lecanemab,3002.13,IV Infusion,Switzerland,Brazil,Jul-24,11832,400.92,"4,743,685.44",Re-export,Road,Geneva,Sao Paulo GRU,DAP,Hikma,Released with Bond,EXIM_MOCK_v1
+210,EXIM-156688,Risdiplam,3004.90,Oral Solution,Australia,France,Oct-24,1114.7,1067.86,"1,190,343.54",Re-export,Courier,Melbourne,Marseille,FOB,Lupin,Cleared,EXIM_MOCK_v1
+211,EXIM-916779,Risdiplam,3004.90,Oral Solution,Switzerland,Mexico,Mar-24,2103.6,244.35,"514,014.66",Re-export,Rail,Zurich,Mexico City,DAP,Cipla,Cleared,EXIM_MOCK_v1
+212,EXIM-704272,Risdiplam,3004.90,Oral Solution,USA,Canada,Jun-24,9483.9,216.3,"2,051,367.57",Re-export,Air,Los Angeles,Toronto Pearson,FOB,Mylan,Cleared,EXIM_MOCK_v1
+213,EXIM-549865,Risdiplam,3004.90,Oral Solution,Netherlands,Germany,Aug-24,11788.9,936.8,"11,043,841.52",Re-export,Sea,Amsterdam Schiphol,Frankfurt Air,DAP,Hetero,Cleared,EXIM_MOCK_v1
+214,EXIM-809621,Risdiplam,3004.90,Oral Solution,South Korea,Japan,Jan-24,614,243.3,"149,386.20",Re-export,Road,Incheon,Tokyo Narita,FOB,Lupin,Released with Bond,EXIM_MOCK_v1
+215,EXIM-275133,Risdiplam,3004.90,Oral Solution,India,Italy,Dec-24,3769.9,833.76,"3,143,191.82",Export,Road,Chennai Sea,Genoa,EXW,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+216,EXIM-459381,Risdiplam,3004.90,Oral Solution,USA,Mexico,Jan-24,4508.1,352.54,"1,589,285.57",Re-export,Courier,Houston,Mexico City,DAP,Sandoz,Released with Bond,EXIM_MOCK_v1
+217,EXIM-869735,Risdiplam,3004.90,Oral Solution,Mexico,South Korea,Jun-24,11264.2,202.04,"2,275,818.97",Re-export,Rail,Mexico City,Incheon,FOB,Aurobindo,Under Review,EXIM_MOCK_v1
+218,EXIM-722774,Risdiplam,3004.90,Oral Solution,India,France,Sep-24,2576.3,443.08,"1,141,507.00",Export,Air,Delhi Air,CDG Paris,DDP,Lupin,Released with Bond,EXIM_MOCK_v1
+219,EXIM-597440,Risdiplam,3004.90,Oral Solution,India,Italy,Feb-24,9820.8,28.59,"280,776.67",Export,Air,JNPT Mumbai,Genoa,DDP,Sandoz,Cleared,EXIM_MOCK_v1
+220,EXIM-539170,Risdiplam,3004.90,Oral Solution,Italy,Germany,Apr-24,10443.1,758.22,"7,918,167.28",Re-export,Road,Genoa,Hamburg,DDP,Hetero,Cleared,EXIM_MOCK_v1
+221,EXIM-971889,Risdiplam,3004.90,Oral Solution,Switzerland,USA,Sep-24,10795.6,145.69,"1,572,810.96",Re-export,Air,Geneva,New York JFK,FOB,Aurobindo,Cleared,EXIM_MOCK_v1
+222,EXIM-345896,Risdiplam,3004.90,Oral Solution,Canada,China,Jun-24,10566.4,357.94,"3,782,137.22",Re-export,Air,Vancouver,Shenzhen,DAP,Aurobindo,Cleared,EXIM_MOCK_v1
+223,EXIM-178693,Risdiplam,3004.90,Oral Solution,India,USA,Nov-24,1380.6,136.96,"189,086.98",Export,Courier,JNPT Mumbai,Houston,CPT,Cipla,Cleared,EXIM_MOCK_v1
+224,EXIM-952679,Risdiplam,3004.90,Oral Solution,Italy,Netherlands,Feb-24,13576.5,774.98,"10,521,515.97",Re-export,Rail,Milan Malpensa,Rotterdam,EXW,Hikma,Released with Bond,EXIM_MOCK_v1
+225,EXIM-993385,Risdiplam,3004.90,Oral Solution,Germany,Mexico,Jan-24,12791.1,435.46,"5,570,012.41",Re-export,Road,Hamburg,Mexico City,DDP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+226,EXIM-291752,Risdiplam,3004.90,Oral Solution,Germany,Italy,Nov-24,2599.2,432.25,"1,123,504.20",Re-export,Rail,Frankfurt Air,Genoa,DAP,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+227,EXIM-218548,Risdiplam,3004.90,Oral Solution,USA,South Korea,Jul-24,14436.5,329.84,"4,761,735.16",Re-export,Rail,Houston,Incheon,CPT,Sandoz,Cleared,EXIM_MOCK_v1
+228,EXIM-741018,Tezepelumab,3002.13,SC Injection,Italy,Netherlands,Jan-24,14724.5,1014,"14,930,643.00",Re-export,Air,Genoa,Rotterdam,DDP,Torrent,Cleared,EXIM_MOCK_v1
+229,EXIM-148205,Tezepelumab,3002.13,SC Injection,Japan,Switzerland,Jun-24,9189.8,1035.78,"9,518,611.04",Re-export,Sea,Osaka Kobe,Zurich,DDP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+230,EXIM-553873,Tezepelumab,3002.13,SC Injection,USA,UK,Nov-24,4747.9,846.96,"4,021,281.38",Re-export,Courier,New York JFK,Heathrow,CPT,Hetero,Under Review,EXIM_MOCK_v1
+231,EXIM-993251,Tezepelumab,3002.13,SC Injection,France,Netherlands,Apr-24,7254.8,798.13,"5,790,273.52",Re-export,Rail,CDG Paris,Amsterdam Schiphol,CIF,Sun Pharma,Cleared,EXIM_MOCK_v1
+232,EXIM-522866,Tezepelumab,3002.13,SC Injection,South Korea,Mexico,Mar-24,1169.2,592.52,"692,774.38",Re-export,Sea,Incheon,Veracruz,EXW,Sun Pharma,Released with Bond,EXIM_MOCK_v1
+233,EXIM-621533,Tezepelumab,3002.13,SC Injection,Switzerland,China,Feb-24,6913.5,962.51,"6,654,312.88",Re-export,Rail,Zurich,Shanghai,FOB,Hikma,Cleared,EXIM_MOCK_v1
+234,EXIM-786393,Tezepelumab,3002.13,SC Injection,Italy,France,Jan-24,1584.5,497.74,"788,669.03",Re-export,Courier,Genoa,CDG Paris,DAP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+235,EXIM-850689,Tezepelumab,3002.13,SC Injection,France,South Korea,Jun-24,5482,69.86,"382,972.52",Re-export,Sea,Marseille,Busan,DDP,Lupin,Released with Bond,EXIM_MOCK_v1
+236,EXIM-211486,Tezepelumab,3002.13,SC Injection,South Korea,USA,Feb-24,11401.8,269.99,"3,078,371.98",Re-export,Road,Busan,Houston,EXW,Lupin,Released with Bond,EXIM_MOCK_v1
+237,EXIM-226611,Tezepelumab,3002.13,SC Injection,India,China,Aug-24,2149.7,861.64,"1,852,267.51",Export,Rail,JNPT Mumbai,Shanghai,FOB,Torrent,Released with Bond,EXIM_MOCK_v1
+238,EXIM-579605,Faricimab,3004.90,Intravitreal,China,Canada,Feb-25,11732.2,861.56,"10,107,994.23",Re-export,Air,Shanghai,Vancouver,DDP,Hetero,Cleared,EXIM_MOCK_v1
+239,EXIM-633025,Faricimab,3004.90,Intravitreal,France,Australia,Sep-24,2062.8,601.1,"1,239,949.08",Re-export,Courier,Marseille,Melbourne,CPT,Lupin,Cleared,EXIM_MOCK_v1
+240,EXIM-539001,Faricimab,3004.90,Intravitreal,Netherlands,Germany,Dec-24,8699.4,877.94,"7,637,551.24",Re-export,Sea,Amsterdam Schiphol,Frankfurt Air,FOB,Hetero,Cleared,EXIM_MOCK_v1
+241,EXIM-731792,Faricimab,3004.90,Intravitreal,Australia,Netherlands,Jan-25,3761.2,480.45,"1,807,068.54",Re-export,Road,Sydney,Amsterdam Schiphol,EXW,Cipla,Cleared,EXIM_MOCK_v1
+242,EXIM-819964,Faricimab,3004.90,Intravitreal,Italy,Netherlands,Sep-24,4518.8,843.29,"3,810,658.85",Re-export,Road,Milan Malpensa,Amsterdam Schiphol,CPT,Aurobindo,Under Review,EXIM_MOCK_v1
+243,EXIM-711116,Faricimab,3004.90,Intravitreal,UK,Italy,Mar-24,14721,781.85,"11,509,613.85",Re-export,Sea,Felixstowe,Genoa,DAP,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+244,EXIM-499371,Faricimab,3004.90,Intravitreal,Australia,Italy,Dec-24,6291.3,898.7,"5,653,991.31",Re-export,Courier,Sydney,Milan Malpensa,EXW,Sun Pharma,Cleared,EXIM_MOCK_v1
+245,EXIM-922458,Faricimab,3004.90,Intravitreal,Germany,India,Nov-24,896.2,324.04,"290,404.65",Import,Sea,Hamburg,Delhi Air,EXW,Cipla,Released with Bond,EXIM_MOCK_v1
+246,EXIM-635740,Faricimab,3004.90,Intravitreal,Brazil,China,Jan-25,8140.5,433.63,"3,529,965.02",Re-export,Rail,Sao Paulo GRU,Shanghai,FOB,Hetero,Under Review,EXIM_MOCK_v1
+247,EXIM-113595,Faricimab,3004.90,Intravitreal,Netherlands,Switzerland,Jan-25,10457.1,833.06,"8,711,391.73",Re-export,Air,Amsterdam Schiphol,Geneva,DDP,Sandoz,Cleared,EXIM_MOCK_v1
+248,EXIM-408467,Faricimab,3004.90,Intravitreal,Italy,Brazil,Apr-24,9327.4,938.21,"8,751,059.95",Re-export,Rail,Milan Malpensa,Santos,CIF,Torrent,Released with Bond,EXIM_MOCK_v1
+249,EXIM-683635,Faricimab,3004.90,Intravitreal,South Korea,Germany,Nov-24,1163.3,1155.16,"1,343,797.63",Re-export,Courier,Busan,Frankfurt Air,FOB,Sun Pharma,Cleared,EXIM_MOCK_v1
+250,EXIM-725874,Faricimab,3004.90,Intravitreal,Brazil,Germany,Mar-24,8780.6,309.74,"2,719,703.04",Re-export,Road,Santos,Frankfurt Air,DDP,Sun Pharma,Under Review,EXIM_MOCK_v1
+251,EXIM-650916,Faricimab,3004.90,Intravitreal,India,Switzerland,Mar-25,9399.2,1012.55,"9,517,159.96",Export,Road,Delhi Air,Zurich,DDP,Dr. Reddy's,Released with Bond,EXIM_MOCK_v1
+252,EXIM-323717,Vonoprazan,3004.90,Oral Tablet,Germany,Australia,Feb-24,11804.6,195.45,"2,307,209.07",Re-export,Courier,Frankfurt Air,Sydney,DAP,Dr. Reddy's,Cleared,EXIM_MOCK_v1
+253,EXIM-801432,Vonoprazan,3004.90,Oral Tablet,France,UK,Jun-24,5443.9,266.04,"1,448,295.16",Re-export,Courier,CDG Paris,Heathrow,DAP,Lupin,Cleared,EXIM_MOCK_v1
+254,EXIM-934883,Vonoprazan,3004.90,Oral Tablet,UK,Canada,Apr-24,13572.2,738.37,"10,021,305.31",Re-export,Courier,Felixstowe,Vancouver,CIF,Hetero,Cleared,EXIM_MOCK_v1
+255,EXIM-783176,Vonoprazan,3004.90,Oral Tablet,USA,South Korea,May-24,8126.5,342.98,"2,787,226.97",Re-export,Courier,Los Angeles,Busan,EXW,Hikma,Cleared,EXIM_MOCK_v1
+256,EXIM-802897,Vonoprazan,3004.90,Oral Tablet,China,Japan,Sep-24,1281.1,119.67,"153,309.24",Re-export,Courier,Shanghai,Tokyo Narita,DAP,Hetero,Cleared,EXIM_MOCK_v1
+257,EXIM-124906,Vonoprazan,3004.90,Oral Tablet,France,Switzerland,Apr-24,12981,511.93,"6,645,363.33",Re-export,Air,CDG Paris,Geneva,CIF,Hetero,Cleared,EXIM_MOCK_v1
+258,EXIM-527433,Vonoprazan,3004.90,Oral Tablet,South Korea,Netherlands,Jun-24,616.4,92.53,"57,035.49",Re-export,Sea,Incheon,Amsterdam Schiphol,EXW,Torrent,Cleared,EXIM_MOCK_v1
+259,EXIM-892682,Vonoprazan,3004.90,Oral Tablet,Japan,Canada,Nov-24,6096.5,383.1,"2,335,569.15",Re-export,Rail,Tokyo Narita,Toronto Pearson,CPT,Lupin,Cleared,EXIM_MOCK_v1
+260,EXIM-395192,Vonoprazan,3004.90,Oral Tablet,Italy,Australia,Jan-24,10528.2,91.74,"965,857.07",Re-export,Courier,Genoa,Sydney,FOB,Hetero,Released with Bond,EXIM_MOCK_v1
+261,EXIM-764845,Vonoprazan,3004.90,Oral Tablet,Netherlands,South Korea,Jul-24,5956.9,794.56,"4,733,114.46",Re-export,Rail,Amsterdam Schiphol,Busan,CIF,Cipla,Under Review,EXIM_MOCK_v1
+262,EXIM-700538,Vonoprazan,3004.90,Oral Tablet,Germany,UK,Nov-24,13310.3,1158.61,"15,421,446.68",Re-export,Road,Hamburg,Heathrow,FOB,Dr. Reddy's,Under Review,EXIM_MOCK_v1
+263,EXIM-292930,Belzutifan,3004.90,Oral Tablet,Japan,Australia,Sep-24,14207.3,369.11,"5,244,056.50",Re-export,Road,Tokyo Narita,Sydney,CIF,Hetero,Cleared,EXIM_MOCK_v1
+264,EXIM-804313,Belzutifan,3004.90,Oral Tablet,China,France,Feb-25,3828.5,141.97,"543,532.15",Re-export,Courier,Shanghai,Marseille,FOB,Hetero,Cleared,EXIM_MOCK_v1
+265,EXIM-204904,Belzutifan,3004.90,Oral Tablet,USA,UK,Feb-24,3001.4,698.81,"2,097,408.33",Re-export,Road,Houston,Heathrow,EXW,Hetero,Under Review,EXIM_MOCK_v1
+266,EXIM-946934,Belzutifan,3004.90,Oral Tablet,Brazil,France,Feb-24,13506.8,384.75,"5,196,741.30",Re-export,Rail,Santos,Marseille,EXW,Torrent,Released with Bond,EXIM_MOCK_v1
+267,EXIM-812591,Belzutifan,3004.90,Oral Tablet,UK,South Korea,Mar-24,122.2,299.18,"36,559.80",Re-export,Sea,Felixstowe,Incheon,CPT,Mylan,Cleared,EXIM_MOCK_v1
+268,EXIM-966589,Belzutifan,3004.90,Oral Tablet,Italy,UK,Mar-25,7225.3,537.2,"3,881,431.16",Re-export,Road,Milan Malpensa,Felixstowe,DDP,Cipla,Cleared,EXIM_MOCK_v1
+269,EXIM-906564,Belzutifan,3004.90,Oral Tablet,Germany,Australia,Apr-24,3985.4,1064.17,"4,241,143.12",Re-export,Air,Hamburg,Melbourne,CPT,Sun Pharma,Cleared,EXIM_MOCK_v1
+270,EXIM-909652,Belzutifan,3004.90,Oral Tablet,Australia,China,Mar-25,598,316.44,"189,231.12",Re-export,Courier,Melbourne,Shanghai,DDP,Teva,Under Review,EXIM_MOCK_v1
+271,EXIM-989173,Belzutifan,3004.90,Oral Tablet,Australia,Netherlands,Feb-25,4400.4,560.32,"2,465,632.13",Re-export,Courier,Sydney,Rotterdam,FOB,Teva,Cleared,EXIM_MOCK_v1
+272,EXIM-476224,Belzutifan,3004.90,Oral Tablet,Netherlands,Australia,Nov-24,2529.4,619.39,"1,566,685.07",Re-export,Rail,Rotterdam,Melbourne,CIF,Torrent,Under Review,EXIM_MOCK_v1
+273,EXIM-506945,Belzutifan,3004.90,Oral Tablet,India,Brazil,Jan-25,7340.3,80.12,"588,104.84",Export,Road,JNPT Mumbai,Sao Paulo GRU,CIF,Hetero,Cleared,EXIM_MOCK_v1
+274,EXIM-785428,Belzutifan,3004.90,Oral Tablet,South Korea,Canada,Mar-25,744.2,1176.8,"875,774.56",Re-export,Road,Incheon,Vancouver,FOB,Mylan,Released with Bond,EXIM_MOCK_v1
+275,EXIM-956934,Belzutifan,3004.90,Oral Tablet,Japan,UK,Oct-24,9817.4,1003.39,"9,850,680.99",Re-export,Courier,Osaka Kobe,Felixstowe,EXW,Aurobindo,Cleared,EXIM_MOCK_v1
+276,EXIM-180832,Belzutifan,3004.90,Oral Tablet,Switzerland,UK,Aug-24,11900.2,1065.17,"12,675,736.03",Re-export,Air,Geneva,Heathrow,DAP,Hikma,Under Review,EXIM_MOCK_v1
+277,EXIM-950576,Belzutifan,3004.90,Oral Tablet,Canada,Italy,May-24,3212.2,228.35,"733,505.87",Re-export,Road,Toronto Pearson,Genoa,DAP,Hetero,Cleared,EXIM_MOCK_v1
+278,EXIM-355506,Belzutifan,3004.90,Oral Tablet,UK,Netherlands,Feb-24,7248.7,577.18,"4,183,804.67",Re-export,Sea,Felixstowe,Rotterdam,DAP,Hetero,Under Review,EXIM_MOCK_v1
+279,EXIM-288783,Belzutifan,3004.90,Oral Tablet,India,China,Oct-24,8905.6,166,"1,478,329.60",Export,Courier,JNPT Mumbai,Shenzhen,FOB,Sun Pharma,Under Review,EXIM_MOCK_v1
+TOTAL,,,,,,,,,,"1,264,719,463.59",,,,,,,,
