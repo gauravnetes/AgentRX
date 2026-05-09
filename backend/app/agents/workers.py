@@ -63,7 +63,8 @@ class WebIntelligenceAgent(BaseAgent):
         except Exception:
             synonyms = molecule
             
-        search_query = f"({molecule} OR {synonyms})[Title/Abstract] AND (repurposing OR off-label OR clinical trial OR mechanism)"
+        aliases_string = f"{molecule} OR {synonyms}"
+        search_query = f"({aliases_string}) AND (repurposing[Title/Abstract] OR novel therapeutic[Title/Abstract] OR off-label[Title/Abstract] OR therapeutic potential[Title/Abstract] OR mechanism of action[Title/Abstract])"
         self.log_status("running", f"Connecting to PubMed API. Broadened query: {search_query[:50]}...")
         
         # --- 2. Broadened E-Search ---
@@ -119,7 +120,7 @@ class WebIntelligenceAgent(BaseAgent):
                         if abstract_parts:
                             abstract = " ".join([p.text for p in abstract_parts if p.text])
                     
-                    literature_context += f"--- PMID:{pmid} ---\nTitle: {title}\nAbstract: {abstract}\n\n"
+                    literature_context += f"[VALID PMID: {pmid}] Title: {title}\nAbstract: {abstract}\n\n"
                     
             except Exception as e:
                 self.log_status("warning", f"XML parsing failed, using raw fallback: {e}")
@@ -127,8 +128,8 @@ class WebIntelligenceAgent(BaseAgent):
             
         # --- 4. Extract the raw PMIDs from our fetched abstracts so we can inject them into the prompt
         import re as _re
-        fetched_pmids = _re.findall(r'PMID:(\d+)', literature_context)
-        pmid_hint = ', '.join([f'PMID:{p}' for p in fetched_pmids]) if fetched_pmids else 'No PMIDs found in abstracts'
+        fetched_pmids = _re.findall(r'\[VALID PMID: (\d+)\]', literature_context)
+        pmid_hint = ', '.join([f'[VALID PMID: {p}]' for p in fetched_pmids]) if fetched_pmids else 'No PMIDs found in abstracts'
         
         self.log_status("running", "AI reasoning over fetched abstracts to calculate pathway overlap...")
         
@@ -150,15 +151,16 @@ class WebIntelligenceAgent(BaseAgent):
                     "disease_name": "Name of disease using only standard ASCII hyphens (-), no special unicode characters",
                     "pathway_overlap_score": 0.85,
                     "reasoning": "Brief 1-sentence explanation",
-                    "citations": ["PMID:12345678", "PMID:87654321"]
+                    "citations": ["[VALID PMID: 12345678]", "[VALID PMID: 87654321]"]
                 }}
             ]
         }}
         
         CRITICAL RULES:
-        1. The 'citations' array MUST be populated with real PMIDs from the list above: [{pmid_hint}]. Do NOT leave it empty.
-        2. Each candidate should cite at least 1-2 of the PMIDs above that best support the disease connection.
-        3. Use ONLY simple ASCII hyphens (-) in disease names. Never use special unicode characters.
+        1. CRITICAL CLINICAL RULE: You must meticulously distinguish between a therapeutic target and an adverse event. If the abstracts state that a drug INCREASES the risk of a condition, causes toxicity, or is linked as a side effect (e.g., 'associated with increased depression'), you are STRICTLY FORBIDDEN from listing that condition as a repurposing candidate. You may only suggest conditions where the drug shows a protective, curative, or mitigating effect.
+        2. The 'citations' array MUST be populated with real PMIDs from the list above: [{pmid_hint}]. You may ONLY cite PMIDs that exactly match the [VALID PMID: X] tags provided in the text. Do not invent numbers.
+        3. Each candidate should cite at least 1-2 of the PMIDs above that best support the disease connection.
+        4. Use ONLY simple ASCII hyphens (-) in disease names. Never use special unicode characters.
         """
         
         try:
@@ -344,7 +346,14 @@ class CommercialViabilityAgent(BaseAgent):
     async def _fetch_financial_tam(self, disease: str) -> str:
         """Dynamically estimates the Total Addressable Market (TAM) for a specific disease using the LLM."""
         try:
-            prompt = f"You are a healthcare financial analyst. Estimate the global Total Addressable Market (TAM) for {disease} in Billions of USD. Return ONLY a realistic numeric estimate followed by 'Billion' (e.g., '$4.2 Billion'). Do not include any other text."
+            prompt = f"""You are a healthcare financial analyst. Estimate the global Total Addressable Market (TAM) for {disease} in Billions of USD. 
+            
+            TAM ESTIMATION RULES: If you cannot find direct competitor revenue for the exact indication, you must calculate a "Proxy TAM" based on global disease burden. When outputting the TAM, you MUST append the methodology in parentheses.
+
+            Example: "$3.5 Billion (Estimated via global disease burden proxy)"
+            Example: "$250 Million (Estimated via existing off-label expenditure)"
+
+            Return ONLY the realistic numeric estimate formatted exactly like the examples above. Do not include any other conversational text."""
             response = await self.llm.ainvoke(prompt)
             estimate = response.content.strip()
             return estimate if "Billion" in estimate else f"{estimate} Billion"
@@ -408,6 +417,10 @@ class CommercialViabilityAgent(BaseAgent):
                 prompt = f"""
                 You are a Biotech Venture Capitalist. Write a strict 2-sentence investment thesis for repurposing a drug for {disease}.
                 
+                CRITICAL CLINICAL CHECK: Before writing the VC Recommendation, you MUST cross-reference the candidate indication against standard medical practice. Ask yourself: "Is this drug already widely prescribed off-label for this disease?" 
+                * If YES (e.g., Aspirin for preeclampsia/fetal growth): You MUST explicitly state: "Note: This molecule is already heavily utilized off-label as the standard of care for this indication. The commercial opportunity lies in formalizing FDA approval, developing targeted delivery mechanisms, or creating proprietary formulations, rather than novel discovery."
+                * If NO: Proceed with the standard novel repurposing thesis.
+                
                 DO NOT GUESS NUMBERS. Use ONLY these hard facts pulled from live government/financial APIs:
                 - Existing FDA Competitors: {', '.join(competitors)}
                 - Active Clinical Trials: {trials['total_active']} (Phase 3: {trials['phase_3_trials']})
@@ -416,10 +429,11 @@ class CommercialViabilityAgent(BaseAgent):
                 
                 Output JSON:
                 {{
+                    "is_currently_used_off_label": true/false,
                     "tam_estimate": "{tam_estimate}",
                     "trial_complexity": "{trials['complexity']}",
                     "competitors": {competitors},
-                    "recommendation": "Your 2-sentence VC thesis here based on the data above."
+                    "recommendation": "If is_currently_used_off_label is TRUE, you MUST start this paragraph with 'Note: This is already standard-of-care off-label.' Your 2-sentence VC thesis here based on the data above."
                 }}
                 """
                 
