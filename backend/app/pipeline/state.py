@@ -6,6 +6,8 @@ class AgentRXState(TypedDict):
     synonyms: str
     job_status: str
 
+    literature_review: str
+
     # Phase 1: Parallel Discovery
     # Using operator.add ensures that if multiple agents return items,
     # they are appended to the list rather than overwriting it.

@@ -210,11 +210,13 @@ class PDFReportBuilder:
         commercial_data: List[Dict[str, Any]],
         supply_chain_data: Dict[str, Any],
         merged_diseases: List[Dict[str, Any]],
+        literature_review: str = "",
         synonyms: str = "",
     ):
         self.thread_id = thread_id
         self.molecule = molecule
         self.synonyms = synonyms
+        self.literature_review = literature_review
         self.narrative = narrative
         self.ip_cleared = ip_cleared_diseases
         self.merged_diseases = merged_diseases
@@ -320,12 +322,20 @@ class PDFReportBuilder:
             row1.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "MIDDLE"), ("ALIGN", (1, 0), (1, 0), "CENTER")]))
             elements.append(KeepTogether([row1, Spacer(1, 6 * mm)]))
 
-        # --- Row 2: Pathway Overlap chart ---
-        overlap_buf = visualizations.generate_pathway_overlap_chart(self.ip_cleared)
-        if overlap_buf:
-            img = Image(overlap_buf, width=14 * cm, height=5.5 * cm)
+        # --- Row 2: Risk/Reward Scatter Plot (replaces plain Pathway Overlap bar chart) ---
+        # Use ALL commercial candidates so both TREATS and WORSENS_OR_CAUSES appear on the matrix
+        scatter_candidates = self.commercial if self.commercial else self.ip_cleared
+        scatter_buf = visualizations.generate_risk_reward_scatter(scatter_candidates)
+        if scatter_buf:
+            img = Image(scatter_buf, width=16 * cm, height=11 * cm)
             elements.append(KeepTogether([
-                Paragraph("Pathway Overlap Scores", s["subsection_header"]),
+                Paragraph("Risk / Reward Matrix", s["subsection_header"]),
+                Paragraph(
+                    "Each bubble represents a candidate indication. "
+                    "<b>Dark = TREATS</b> (high efficacy target). <b>Gray = WORSENS/CAUSES</b> (toxicity risk). "
+                    "Bubble size reflects the risk-adjusted commercial score.",
+                    s["caption"]
+                ),
                 img, Spacer(1, 4 * mm)
             ]))
 
@@ -341,6 +351,7 @@ class PDFReportBuilder:
         elements.append(PageBreak())
         return elements
 
+
     # ------------------------------------------------------------------
     # Section 1: Discovery
     # ------------------------------------------------------------------
@@ -355,27 +366,41 @@ class PDFReportBuilder:
         narrative = self.narrative.get("discovery", "No discovery narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
         elements.append(Spacer(1, 4 * mm))
+        
+        if self.literature_review:
+            elements.append(Paragraph("Phase 1: Neutral Literature Baseline", s["subsection_header"]))
+            # Convert literal newlines to HTML <br/> for ReportLab Paragraph
+            formatted_review = self.literature_review.replace('\n', '<br/>')
+            elements.append(Paragraph(formatted_review, s["body"]))
+            elements.append(Spacer(1, 4 * mm))
 
         if self.ip_cleared:
             elements.append(Paragraph("IP-Cleared Candidates", s["subsection_header"]))
 
             table_data = [[
                 Paragraph("Indication", s["table_header"]),
-                Paragraph("Pathway Score", s["table_header"]),
-                Paragraph("FTO Status", s["table_header"]),
-                Paragraph("Blocking Patents", s["table_header"]),
+                Paragraph("Relationship", s["table_header"]),
+                Paragraph("Evidence", s["table_header"]),
+                Paragraph("Confidence", s["table_header"]),
+                Paragraph("Path. Score", s["table_header"]),
+                Paragraph("FTO", s["table_header"]),
             ]]
 
             for c in self.ip_cleared:
                 fto = c.get("fto_status", "UNKNOWN")
+                rel = c.get("relationship_type", c.get("effect_direction", "—"))
+                evidence = c.get("evidence_level", "—")
+                confidence = c.get("confidence", "—")
                 table_data.append([
                     Paragraph(c.get("disease_name", "—"), s["table_cell"]),
+                    Paragraph(rel, s["table_cell"]),
+                    Paragraph(evidence, s["table_cell"]),
+                    Paragraph(confidence, s["table_cell"]),
                     Paragraph(f"{c.get('pathway_overlap_score', 0.0):.2f}", s["table_cell"]),
                     Paragraph(fto, s["table_cell"]),
-                    Paragraph(str(c.get("blocking_patents", 0)), s["table_cell"]),
                 ])
 
-            t = Table(table_data, colWidths=[7 * cm, 3 * cm, 3 * cm, 4 * cm])
+            t = Table(table_data, colWidths=[5*cm, 3.5*cm, 3*cm, 2.5*cm, 2*cm, 1.5*cm])
             t.setStyle(TableStyle([
                 ("BACKGROUND", (0, 0), (-1, 0), COLOR_DARK),
                 ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_OFFWHT]),
@@ -431,6 +456,24 @@ class PDFReportBuilder:
 
         narrative = self.narrative.get("ip_analysis", "No IP analysis narrative available.")
         elements.append(Paragraph(narrative, s["body"]))
+
+        # --- Add Patent Links ---
+        blocked_candidates = [c for c in self.merged_diseases if c.get("fto_status") == "BLOCKED" and c.get("patent_ids")]
+        if blocked_candidates:
+            elements.append(Spacer(1, 6 * mm))
+            elements.append(Paragraph("Identified Blocking Patents (Sample)", s["subsection_header"]))
+            
+            for c in blocked_candidates:
+                disease = c.get("disease_name", "Unknown")
+                pids = c.get("patent_ids", [])
+                links = []
+                for pid in pids:
+                    # Europe PMC links for patents (often prefixed with PAT/)
+                    links.append(f'<link href="https://europepmc.org/article/PAT/{pid}" color="blue">{pid}</link>')
+                
+                if links:
+                    link_str = ", ".join(links)
+                    elements.append(Paragraph(f"<b>{disease}:</b> {link_str}", s["body"]))
 
         return elements
 
@@ -708,10 +751,11 @@ Paragraph 3: Supply chain readiness and recommended next steps.
             molecule=molecule,
             narrative=narrative,
             ip_cleared_diseases=ip_cleared,
-            commercial_data=commercial,
-            supply_chain_data=supply_chain,
-            merged_diseases=merged_diseases,
-            synonyms=synonyms
+            commercial_data=input_data.get("commercial_data", []),
+            supply_chain_data=input_data.get("supply_chain_data", {}),
+            merged_diseases=input_data.get("merged_diseases", []),
+            literature_review=input_data.get("literature_review", ""),
+            synonyms=input_data.get("synonyms", "")
         )
         pdf_path = builder.build()
         self.log_status("done", f"PDF saved: {pdf_path}")

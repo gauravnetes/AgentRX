@@ -80,7 +80,8 @@ async def node_web_discovery(state: AgentRXState):
     return {
         "diseases_bio": diseases,
         "narrative": {"discovery": narrative_text},
-        "synonyms": result.get("synonyms", "")
+        "synonyms": result.get("synonyms", ""),
+        "literature_review": result.get("literature_review", "")
     }
 
 # ---------------------------------------------------------------------------
@@ -233,6 +234,7 @@ async def node_generate_report(state: AgentRXState):
         "merged_diseases": state.get("merged_diseases", []),
         "commercial_data": state.get("commercial_data", []),
         "supply_chain_data": state.get("supply_chain_data", {}),
+        "literature_review": state.get("literature_review", ""),
     }
 
     result = await report_agent.execute_with_retries(report_input)
