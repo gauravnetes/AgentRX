@@ -413,7 +413,6 @@ class PDFReportBuilder:
                 ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
             ]))
             elements.append(KeepTogether([
-                Paragraph("IP-Cleared Candidates", s["subsection_header"]),
                 t
             ]))
             
@@ -865,11 +864,11 @@ Paragraph 3 (Safety & Supply Chain): Detail any toxicity risks (Vacuum Fallback/
         pdf_path = builder.build()
         self.log_status("done", f"PDF saved: {pdf_path}")
 
-        # 3. Return URLs (local path for now; MinIO hook can be added here)
         report_urls = {
             "local": pdf_path,
             "download_path": f"/api/pipeline/report/{thread_id}",
         }
+        self.log_status("done", f"Report generation complete. URL: {report_urls['download_path']}")
 
         return {
             "narrative": narrative,

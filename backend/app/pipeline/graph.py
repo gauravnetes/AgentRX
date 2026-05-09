@@ -262,13 +262,14 @@ async def node_generate_report(state: AgentRXState):
         "commercial_data": state.get("commercial_data", []),
         "supply_chain_data": state.get("supply_chain_data", {}),
         "literature_review": state.get("literature_review", ""),
+        "pharmacology_data": state.get("pharmacology_data", {}),
     }
 
     result = await report_agent.execute_with_retries(report_input)
 
     report_urls = result.get("report_urls", {})
     telemetry.emit(tid, "Report Generator Agent", "completed",
-                   f"PDF report saved → {report_urls.get('download_path', 'N/A')}")
+                   f"PDF report saved: {report_urls.get('download_path', 'N/A')}")
 
     return {
         "narrative": result.get("narrative", {}),
@@ -292,8 +293,7 @@ workflow.add_node("generate_report",              node_generate_report)
 
 # Wire up the edges
 workflow.add_edge(START,                           "pharmacodynamic_mapping")
-workflow.add_edge(START,                           "pharmacology_profiling")
-workflow.add_edge("pharmacodynamic_mapping",       "merge_data")
+workflow.add_edge("pharmacodynamic_mapping",       "pharmacology_profiling")
 workflow.add_edge("pharmacology_profiling",        "merge_data")
 workflow.add_edge("merge_data",                    "ip_whitespace_clearance")
 workflow.add_edge("ip_whitespace_clearance",       "commercial_viability_screening")

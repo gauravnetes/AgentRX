@@ -654,19 +654,23 @@ class CommercialViabilityAgent(BaseAgent):
                 - Pathway Overlap Score: {pathway_score:.2f}
                 - Toxicity Penalty Score: {toxicity_penalty:.2f} (if > 0.5, you MUST propose a novel 505(b)(2) formulation or delivery mechanism to mitigate this toxicity risk)
                 
-                Output JSON:
+                Output ONLY valid JSON. Do not include markdown codeblocks around your response.
                 {{
-                    "is_currently_used_off_label": true/false,
+                    "is_currently_used_off_label": true,
                     "tam_estimate": "{tam_estimate}",
                     "trial_complexity": "{trials['complexity']}",
                     "competitors": {competitors},
-                    "recommendation": "Your VC thesis here, following all the rules above."
+                    "recommendation": "Write your 2-3 sentence VC thesis here. Do NOT include JSON or markdown blocks in this string."
                 }}
                 """
                 
                 # Invoke the LLM for the VC recommendation text only
                 response = await self.llm.ainvoke(prompt)
                 ai_data = self._parse_json_safely(response.content)
+                
+                # Clean recommendation of accidental markdown
+                rec_text = ai_data.get("recommendation", "Awaiting manual review.")
+                rec_text = str(rec_text).replace("```json", "").replace("```", "").strip()
                 
                 # CRITICAL FIX: always use the hard API-derived complexity — never trust LLM to override it
                 hard_complexity = trials["complexity"]
@@ -685,7 +689,7 @@ class CommercialViabilityAgent(BaseAgent):
                     "tam_estimate": ai_data.get("tam_estimate", tam_estimate),
                     "trial_complexity": hard_complexity,
                     "competitors": ai_data.get("competitors", competitors),
-                    "recommendation": ai_data.get("recommendation", "Awaiting manual review."),
+                    "recommendation": rec_text,
                     "risk_adjusted_score": risk_adjusted_score,
                     "pathway_overlap_score": pathway_score,
                     "toxicity_penalty_score": toxicity_penalty,
