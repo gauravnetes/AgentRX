@@ -359,7 +359,7 @@ export default function DashboardPage() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              <ReportView insights={insights} threadId={threadId} />
+              <ReportView insights={insights} threadId={threadId} molecule={molecule} />
             </motion.div>
           )}
         </AnimatePresence>

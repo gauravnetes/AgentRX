@@ -18,9 +18,7 @@ import {
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Overview", href: "/dashboard" },
   { icon: Network, label: "Pipeline", href: "/dashboard/pipeline" },
-  { icon: FlaskConical, label: "Intelligence", href: "/dashboard/intelligence" },
   { icon: FileText, label: "Reports", href: "/dashboard/reports" },
-  { icon: TrendingUp, label: "Trends", href: "/dashboard/trends" },
 ];
 
 export function Sidebar() {
