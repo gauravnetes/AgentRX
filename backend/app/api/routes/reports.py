@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy import delete, update
 
 from app.core.db import get_db
 from app.models.report import Report, TelemetryEvent
@@ -9,13 +10,8 @@ router = APIRouter()
 
 @router.get("/")
 async def list_reports(db: AsyncSession = Depends(get_db)):
-    """
-    Fetch all reports for the UI dashboard sidebar.
-    Returns basic metadata (molecule, status, date).
-    """
     result = await db.execute(select(Report).order_by(Report.created_at.desc()))
     reports = result.scalars().all()
-    
     return [
         {
             "id": r.id,
@@ -29,16 +25,10 @@ async def list_reports(db: AsyncSession = Depends(get_db)):
 
 @router.get("/{thread_id}")
 async def get_report(thread_id: str, db: AsyncSession = Depends(get_db)):
-    """
-    Fetch the detailed insights and status for a specific report.
-    Used to populate the 'Opportunity Insights' and final summary view.
-    """
     result = await db.execute(select(Report).where(Report.thread_id == thread_id))
     report = result.scalar_one_or_none()
-    
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
-        
     return {
         "id": report.id,
         "thread_id": report.thread_id,
@@ -48,3 +38,26 @@ async def get_report(thread_id: str, db: AsyncSession = Depends(get_db)):
         "pdf_path": report.pdf_path,
         "created_at": report.created_at.isoformat()
     }
+
+@router.delete("/{thread_id}")
+async def delete_report(thread_id: str, db: AsyncSession = Depends(get_db)):
+    """Delete a single run and its telemetry from the database."""
+    result = await db.execute(select(Report).where(Report.thread_id == thread_id))
+    report = result.scalar_one_or_none()
+    if not report:
+        raise HTTPException(status_code=404, detail="Report not found")
+    await db.execute(delete(TelemetryEvent).where(TelemetryEvent.thread_id == thread_id))
+    await db.execute(delete(Report).where(Report.thread_id == thread_id))
+    await db.commit()
+    return {"status": "deleted", "thread_id": thread_id}
+
+@router.post("/clear-stuck")
+async def clear_stuck_runs(db: AsyncSession = Depends(get_db)):
+    """Mark all RUNNING / PAUSED_FOR_HUMAN runs as FAILED so they clear from the UI."""
+    await db.execute(
+        update(Report)
+        .where(Report.status.in_(["RUNNING", "PAUSED_FOR_HUMAN"]))
+        .values(status="FAILED")
+    )
+    await db.commit()
+    return {"status": "ok", "message": "Stuck runs marked as FAILED"}

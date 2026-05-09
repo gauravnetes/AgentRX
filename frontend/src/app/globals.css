@@ -12,6 +12,15 @@
   --color-subtle: #1E222A;
 }
 
+/* ── Hide ALL scrollbars globally ── */
+* {
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* IE / Edge */
+}
+*::-webkit-scrollbar {
+  display: none;                /* Chrome / Safari / Opera */
+}
+
 @layer base {
   * {
     border-color: var(--color-border);
