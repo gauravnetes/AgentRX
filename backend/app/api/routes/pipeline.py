@@ -62,22 +62,66 @@ class MoleculeValidator:
     MAX_LEN = 120
 
     @classmethod
-    def validate(cls, molecule: str):
+    async def validate(cls, molecule: str):
         import re
         name = molecule.strip()
         if len(name) < cls.MIN_LEN:
-            return False, f"Molecule name is too short (minimum {cls.MIN_LEN} characters)."
+            return False, f"Molecule name is too short (minimum {cls.MIN_LEN} characters).", name
         if len(name) > cls.MAX_LEN:
-            return False, f"Molecule name is too long (maximum {cls.MAX_LEN} characters)."
+            return False, f"Molecule name is too long (maximum {cls.MAX_LEN} characters).", name
         if not cls.LEGAL_CHARS_RE.match(name):
-            return False, "Molecule name contains invalid characters. Only letters, digits, hyphens, spaces, and parentheses are allowed."
+            return False, "Molecule name contains invalid characters. Only letters, digits, hyphens, spaces, and parentheses are allowed.", name
         if re.match(r"^\d+$", name):
-            return False, "Molecule name cannot be a plain number."
+            return False, "Molecule name cannot be a plain number.", name
         if name.lower() in cls.BLACKLIST:
-            return False, f"'{name}' is not a recognised pharmaceutical molecule name."
+            return False, f"'{name}' is not a recognised pharmaceutical molecule name.", name
         if not re.search(r"[A-Za-z]", name):
-            return False, "Molecule name must contain at least one letter."
-        return True, ""
+            return False, "Molecule name must contain at least one letter.", name
+            
+        # --- LLM Semantic Gatekeeper & Spellchecker ---
+        try:
+            import os
+            import json
+            from langchain_openai import ChatOpenAI
+            
+            llm = ChatOpenAI(
+                api_key=os.getenv("OPENROUTER_API_KEY"),
+                base_url="https://openrouter.ai/api/v1",
+                model="openai/gpt-4o-mini",
+                temperature=0.0
+            )
+            
+            prompt = f"""
+            You are a strict pharmacological security gatekeeper.
+            Analyze the user input: "{name}"
+            
+            RULES:
+            1. Is this a real biological molecule, drug, active pharmaceutical ingredient (API), or chemical compound?
+            2. "Aspirin", "Phenol", "Vitamin C", "Tylenol" = TRUE.
+            3. "iPhone 12", "Car", "Laptop", "Hello", "test" = FALSE.
+            4. If it's a valid drug but misspelled (e.g. "coocaine"), automatically correct it (e.g. "cocaine").
+            
+            Return ONLY valid JSON format:
+            {{
+                "is_valid": true or false,
+                "corrected_name": "the corrected scientific name, or the original if correct. If invalid, leave empty.",
+                "reason": "Brief reason why it was rejected or accepted"
+            }}
+            """
+            
+            response = await llm.ainvoke(prompt)
+            json_match = re.search(r'\{.*\}', response.content, re.DOTALL)
+            data = json.loads(json_match.group(0)) if json_match else json.loads(response.content)
+            
+            if not data.get("is_valid", False):
+                return False, data.get("reason", "Rejected by AI semantic filter: Not a recognised drug or chemical."), name
+                
+            return True, "", data.get("corrected_name", name)
+            
+        except Exception as e:
+            # Fallback to true if LLM fails (to prevent pipeline from breaking completely)
+            print(f"[MoleculeValidator] LLM Gatekeeper failed, falling back to regex pass: {e}")
+            return True, "", name
 
 
 # ---------------------------------------------------------------------------
@@ -91,7 +135,7 @@ async def start_pipeline(req: StartRequest, background_tasks: BackgroundTasks):
     Returns 202 Accepted with a thread_id for SSE streaming.
     """
     # --- Gate: Validate molecule name before launching any background work ---
-    is_valid, reason = MoleculeValidator.validate(req.molecule)
+    is_valid, reason, corrected_name = await MoleculeValidator.validate(req.molecule)
     if not is_valid:
         raise HTTPException(
             status_code=422,
@@ -105,7 +149,7 @@ async def start_pipeline(req: StartRequest, background_tasks: BackgroundTasks):
     thread_id = str(uuid.uuid4())
 
     try:
-        background_tasks.add_task(master.start_pipeline, molecule=req.molecule.strip(), thread_id=thread_id)
+        background_tasks.add_task(master.start_pipeline, molecule=corrected_name.strip(), thread_id=thread_id)
         return {
             "status": "ACCEPTED",
             "thread_id": thread_id,
