@@ -22,6 +22,7 @@ from langgraph.graph import StateGraph, START, END
 from app.pipeline.state import AgentRXState
 from app.agents.workers import (
     WebIntelligenceAgent,
+    PharmacologyAgent,
     PatentLandscapeAgent,
     CommercialViabilityAgent,
     IQVIASupplyChainAgent,
@@ -39,6 +40,7 @@ def _thread_id(state: AgentRXState) -> str:
 # ---------------------------------------------------------------------------
 
 web_agent        = WebIntelligenceAgent()
+pharm_agent      = PharmacologyAgent()
 patent_agent     = PatentLandscapeAgent()
 commercial_agent = CommercialViabilityAgent()
 iqvia_agent      = IQVIASupplyChainAgent()
@@ -82,6 +84,31 @@ async def node_web_discovery(state: AgentRXState):
         "narrative": {"discovery": narrative_text},
         "synonyms": result.get("synonyms", ""),
         "literature_review": result.get("literature_review", "")
+    }
+
+# ---------------------------------------------------------------------------
+# Node: Pharmacology Profiling
+# ---------------------------------------------------------------------------
+
+async def node_pharmacology(state: AgentRXState):
+    tid = _thread_id(state)
+    telemetry.emit(tid, "Pharmacology Agent", "running",
+                   f"Querying PubChem for {state.get('molecule', '?')} properties...")
+
+    result = await pharm_agent.execute_with_retries(state)
+    pharm_data = result.get("pharmacology_data", {})
+    
+    narrative_text = (
+        f"Chemical profile established for {state.get('molecule', '?')}. "
+        f"Class: {pharm_data.get('chemical_class', 'Unknown')}. "
+        f"Mechanism: {pharm_data.get('mechanism_of_action', 'Unknown')}."
+    )
+    
+    telemetry.emit(tid, "Pharmacology Agent", "completed", "Chemical profiling complete.")
+    
+    return {
+        "pharmacology_data": pharm_data,
+        "narrative": {"pharmacology": narrative_text}
     }
 
 # ---------------------------------------------------------------------------
@@ -256,15 +283,18 @@ workflow = StateGraph(AgentRXState)
 
 # Register nodes
 workflow.add_node("pharmacodynamic_mapping",      node_web_discovery)
+workflow.add_node("pharmacology_profiling",       node_pharmacology)
 workflow.add_node("merge_data",                   node_merge_data)
 workflow.add_node("ip_whitespace_clearance",      node_patent_check)
 workflow.add_node("commercial_viability_screening", node_commercial_filter)
 workflow.add_node("iqvia_exim_analysis",          node_supply_chain_analysis)
 workflow.add_node("generate_report",              node_generate_report)
 
-# Wire up the edges (strict sequential M2M pipeline)
+# Wire up the edges
 workflow.add_edge(START,                           "pharmacodynamic_mapping")
+workflow.add_edge(START,                           "pharmacology_profiling")
 workflow.add_edge("pharmacodynamic_mapping",       "merge_data")
+workflow.add_edge("pharmacology_profiling",        "merge_data")
 workflow.add_edge("merge_data",                    "ip_whitespace_clearance")
 workflow.add_edge("ip_whitespace_clearance",       "commercial_viability_screening")
 workflow.add_edge("commercial_viability_screening","iqvia_exim_analysis")

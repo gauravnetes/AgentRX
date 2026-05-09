@@ -7,6 +7,7 @@ class AgentRXState(TypedDict):
     job_status: str
 
     literature_review: str
+    pharmacology_data: Dict[str, Any]
 
     # Phase 1: Parallel Discovery
     # Using operator.add ensures that if multiple agents return items,

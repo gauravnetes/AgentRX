@@ -237,20 +237,20 @@ def generate_risk_reward_scatter(candidates: List[Dict[str, Any]]) -> io.BytesIO
             fontweight='bold' if rel_type in POSITIVE_TYPES else 'normal'
         )
 
-    ax.set_xlim(0, 1.05)
-    ax.set_ylim(0, 1.05)
+    ax.set_xlim(-0.1, 1.15)
+    ax.set_ylim(-0.1, 1.15)
     ax.set_xlabel("Pathway Overlap Score (Efficacy →)", fontsize=9)
     ax.set_ylabel("Toxicity Penalty Score (← Risk)", fontsize=9)
     ax.set_title("Risk / Reward Matrix — All Candidate Indications", fontsize=11, fontweight='bold', pad=15)
 
-    # 3-tier legend
+    # 3-tier legend (Moved outside the plot area underneath the X-axis so it never covers candidates)
     from matplotlib.lines import Line2D
     legend_elements = [
         Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_DARK,   markersize=9, label='Therapeutic (TREATS / PROTECTIVE)'),
         Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_ACCENT,  markersize=9, label='Exploratory (CORRELATED / BIOMARKER)'),
-        Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_LIGHT,   markersize=9, label='Risk / Adverse (CAUSES / WORSENS / etc.)'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_LIGHT,   markersize=9, label='Risk / Adverse (CAUSES / WORSENS)'),
     ]
-    ax.legend(handles=legend_elements, loc='lower right', fontsize=7, framealpha=0.9)
+    ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1, fontsize=7, framealpha=0.9)
 
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)

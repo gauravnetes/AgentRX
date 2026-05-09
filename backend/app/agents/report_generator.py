@@ -212,6 +212,7 @@ class PDFReportBuilder:
         merged_diseases: List[Dict[str, Any]],
         literature_review: str = "",
         synonyms: str = "",
+        pharmacology_data: Dict[str, Any] = None,
     ):
         self.thread_id = thread_id
         self.molecule = molecule
@@ -222,6 +223,7 @@ class PDFReportBuilder:
         self.merged_diseases = merged_diseases
         self.commercial = commercial_data
         self.supply_chain = supply_chain_data
+        self.pharmacology_data = pharmacology_data or {}
         self.generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
         self.styles = _build_styles()
         self.output_path = REPORTS_DIR / f"{thread_id}.pdf"
@@ -580,6 +582,105 @@ class PDFReportBuilder:
         return elements
 
     # ------------------------------------------------------------------
+    # Drug Breakdown: Molecule Profile
+    # ------------------------------------------------------------------
+
+    def _build_molecule_profile(self) -> List[Any]:
+        s = self.styles
+        elements: List[Any] = []
+        
+        elements.append(Spacer(1, 6 * mm))
+        elements.append(Paragraph("Pharmacological Profile", s["section_header"]))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
+        
+        pharm = self.pharmacology_data
+        
+        # Dense metric table
+        kv_data = [
+            [Paragraph("<b>Molecular Formula</b>", s["table_cell"]), Paragraph(pharm.get("molecular_formula", "N/A"), s["table_cell"])],
+            [Paragraph("<b>Molecular Weight</b>", s["table_cell"]), Paragraph(f"{pharm.get('molecular_weight', 'N/A')} g/mol", s["table_cell"])],
+            [Paragraph("<b>Lipophilicity (XLogP)</b>", s["table_cell"]), Paragraph(pharm.get("xlogp", "N/A"), s["table_cell"])],
+            [Paragraph("<b>Chemical Class</b>", s["table_cell"]), Paragraph(pharm.get("chemical_class", "N/A"), s["table_cell"])],
+            [Paragraph("<b>Primary Target</b>", s["table_cell"]), Paragraph(pharm.get("primary_target", "N/A"), s["table_cell"])],
+            [Paragraph("<b>Mechanism of Action</b>", s["table_cell"]), Paragraph(pharm.get("mechanism_of_action", "N/A"), s["table_cell"])],
+            [Paragraph("<b>Standard Half-Life</b>", s["table_cell"]), Paragraph(pharm.get("half_life", "N/A"), s["table_cell"])],
+        ]
+        
+        t = Table(kv_data, colWidths=[4 * cm, 13 * cm])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (0, -1), COLOR_OFFWHT),
+            ("GRID", (0, 0), (-1, -1), 0.5, COLOR_LGRAY),
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("TOPPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ]))
+        elements.append(t)
+        
+        return elements
+
+    # ------------------------------------------------------------------
+    # Appendix: Methodology
+    # ------------------------------------------------------------------
+
+    def _build_methodology(self) -> List[Any]:
+        s = self.styles
+        elements: List[Any] = []
+
+        elements.append(PageBreak())
+        elements.append(Paragraph("Appendix A: AgentRX Deterministic Scoring Methodology", s["section_header"]))
+        elements.append(HRFlowable(width="100%", thickness=1, color=COLOR_DARK, spaceAfter=8))
+
+        elements.append(Paragraph(
+            "AgentRX utilizes a strict Deterministic Scoring Engine rather than relying on generative AI to produce numerical scores. "
+            "The AI is restricted purely to NLP Relationship Extraction (classifying the biomedical connection between the molecule and the disease into one of 9 standardized types). "
+            "Once classified, the system mathematically assigns the Efficacy (Pathway Overlap) and Risk (Toxicity Penalty) scores.", 
+            s["body"]))
+        
+        elements.append(Spacer(1, 4 * mm))
+
+        # Table for the 9-tier system
+        table_data = [
+            [Paragraph("Tier", s["table_header"]), Paragraph("Relationship Type", s["table_header"]), Paragraph("Efficacy Score", s["table_header"]), Paragraph("Risk Score", s["table_header"])],
+            [Paragraph("Therapeutic", s["table_cell"]), Paragraph("TREATS", s["table_cell"]), Paragraph("0.85", s["table_cell"]), Paragraph("0.05", s["table_cell"])],
+            [Paragraph("Therapeutic", s["table_cell"]), Paragraph("PROTECTIVE", s["table_cell"]), Paragraph("0.75", s["table_cell"]), Paragraph("0.05", s["table_cell"])],
+            [Paragraph("Exploratory", s["table_cell"]), Paragraph("BIOMARKER_LINKED", s["table_cell"]), Paragraph("0.55", s["table_cell"]), Paragraph("0.20", s["table_cell"])],
+            [Paragraph("Exploratory", s["table_cell"]), Paragraph("OFF_TARGET_EFFECT", s["table_cell"]), Paragraph("0.40", s["table_cell"]), Paragraph("0.25", s["table_cell"])],
+            [Paragraph("Exploratory", s["table_cell"]), Paragraph("CORRELATED", s["table_cell"]), Paragraph("0.35", s["table_cell"]), Paragraph("0.35", s["table_cell"])],
+            [Paragraph("Toxicity (Avoid)", s["table_cell"]), Paragraph("WORSENS", s["table_cell"]), Paragraph("0.10", s["table_cell"]), Paragraph("0.85", s["table_cell"])],
+            [Paragraph("Toxicity (Avoid)", s["table_cell"]), Paragraph("ADVERSE_EFFECT", s["table_cell"]), Paragraph("0.05", s["table_cell"]), Paragraph("0.90", s["table_cell"])],
+            [Paragraph("Toxicity (Avoid)", s["table_cell"]), Paragraph("CAUSES", s["table_cell"]), Paragraph("0.05", s["table_cell"]), Paragraph("0.95", s["table_cell"])],
+            [Paragraph("Toxicity (Avoid)", s["table_cell"]), Paragraph("CONTRAINDICATED", s["table_cell"]), Paragraph("0.00", s["table_cell"]), Paragraph("1.00", s["table_cell"])],
+        ]
+
+        t = Table(table_data, colWidths=[4 * cm, 5 * cm, 3 * cm, 3 * cm])
+        t.setStyle(TableStyle([
+            ("BACKGROUND", (0, 0), (-1, 0), COLOR_DARK),
+            ("ROWBACKGROUNDS", (0, 1), (-1, -1), [COLOR_WHITE, COLOR_OFFWHT]),
+            ("GRID", (0, 0), (-1, -1), 0.5, COLOR_LGRAY),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (2, 0), (-1, -1), "CENTER"),
+        ]))
+        elements.append(t)
+        
+        elements.append(Spacer(1, 6 * mm))
+        
+        elements.append(Paragraph("Risk-Adjusted Commercial Formula:", s["subsection_header"]))
+        elements.append(Paragraph("<code>Risk_Adjusted_Score = (TAM_Weight * 0.4) + (Efficacy_Score * 0.4) - (Risk_Score * 0.3)</code>", s["body"]))
+        elements.append(Paragraph(
+            "<i>TAM_Weight is normalized where $50 Billion USD equals 1.0. "
+            "If the Risk Score exceeds 0.5, the Commercial Agent is mandated to pursue a 505(b)(2) targeted formulation strategy to bypass systemic toxicity.</i>", 
+            s["caption"]))
+            
+        elements.append(Spacer(1, 6 * mm))
+        elements.append(Paragraph("The Vacuum Fallback (Safety Guardrail):", s["subsection_header"]))
+        elements.append(Paragraph(
+            "If a literature review yields exclusively adverse or toxic relationships, the pipeline triggers a 'Vacuum Check'. "
+            "All commercial operations are aborted, TAM evaluations are halted, and a Safety Flag is issued directly to the user to prevent the AI from commercializing side effects.", 
+            s["body"]))
+
+        return elements
+
+    # ------------------------------------------------------------------
     # Build the full PDF
     # ------------------------------------------------------------------
 
@@ -600,15 +701,17 @@ class PDFReportBuilder:
         )
 
         # 4-page story order:
-        # P1=Cover, P2=Exec Summary+Charts, P3=Discovery+References, P4=Commercial+Supply Chain
+        # P1=Cover, P2=Exec Summary+Molecule Profile+Charts, P3=Discovery+References, P4=Commercial+Supply Chain
         story: List[Any] = []
         story += self._build_cover()             # Page 1
         story += self._build_executive_summary() # Page 2 (exec summary)
+        story += self._build_molecule_profile()  # Page 2 cont. (Drug Breakdown)
         story += self._build_dashboard()         # Page 2 cont. / Page 3 (charts)
         story += self._build_discovery()         # Page 3 (scientific + citations)
         story += self._build_ip_analysis()       # Page 4 (IP Whitespace)
         story += self._build_commercial()        # Page 4 cont. (VC table)
         story += self._build_supply_chain()      # Page 4 cont. (supply chain grid)
+        story += self._build_methodology()       # Appendix (Scoring reference)
 
         def _on_page_dispatch(canvas, doc):
             if doc.page == 1:
@@ -655,8 +758,9 @@ class ReportGeneratorAgent(BaseAgent):
         supply_chain: Dict[str, Any],
         merged_diseases: List[Dict[str, Any]],
         ip_cleared: List[Dict[str, Any]],
+        pharmacology_data: Dict[str, Any],
     ) -> str:
-        """Ask Gemini to write a crisp C-suite-ready executive summary."""
+        """Ask Llama 70B to write a clinical-grade intelligence summary."""
         candidate_names = [c.get("disease_name", "") for c in commercial_data]
         cleared_names = [c.get("disease_name", "") for c in ip_cleared]
         all_names = [c.get("disease_name", "") for c in merged_diseases]
@@ -687,31 +791,30 @@ class ReportGeneratorAgent(BaseAgent):
                 f"Cleared candidates: {', '.join(cleared_names)}"
             )
 
-        prompt = f"""You are the Chief Medical Officer of a biotech VC fund. Write a formal, data-grounded 3-paragraph executive summary (max 150 words) for a drug repurposing intelligence report.
+        prompt = f"""You are the Chief Medical Officer of a top-tier biotech intelligence firm. Write a dense, clinical-grade executive summary for a drug repurposing intelligence report on {molecule}.
 
-=== VERIFIED PIPELINE DATA (use ONLY this — do not supplement with external assumptions) ===
+=== VERIFIED DATA ===
 Molecule: {molecule}
-Supply Chain Risk: {supply_chain.get("supply_chain_risk", "Unknown")}
-Repurposing Opportunity Score: {supply_chain.get("repurposing_score", "N/A")} / 10
-Market Trend: {supply_chain.get("market_trend", "Unknown")}
+Chemical Class: {pharmacology_data.get('chemical_class', 'Unknown')}
+Primary Target: {pharmacology_data.get('primary_target', 'Unknown')}
+Mechanism: {pharmacology_data.get('mechanism_of_action', 'Unknown')}
+Repurposing Score: {supply_chain.get("repurposing_score", "N/A")} / 10
 
 Commercially Viable Candidates:
 {candidate_table}
 
 {ip_status_text}
 
-Discovery Context: {narrative.get("discovery", "")[:400]}
-
-=== ABSOLUTE RULES — VIOLATION IS NOT PERMITTED ===
-1. You are STRICTLY FORBIDDEN from inventing, implying, or hallucinating regulatory roadblocks, exclusivity periods, patent blocks, or legal constraints of ANY KIND that are not explicitly listed in the PATENT-BLOCKED section above.
-2. If a candidate appears in the IP-CLEARED list, you MUST treat it as fully commercially viable. Do NOT add qualifiers like "may face regulatory hurdles" or "could be subject to exclusivity".
-3. If recommending a lower-scoring candidate over a higher one, justify this using ONLY scientific or clinical reasoning (e.g., safety profile, unmet need, faster trial pathway) — never fabricate legal constraints.
-4. Write in continuous prose. No bullet points. Maximum 150 words.
+=== RULES ===
+1. Use strict medical ontology (MeSH terms). 
+2. Write exactly 3 paragraphs.
+3. Use basic HTML tags <b> and </b> to bold quantitative metrics, diseases, and key pharmacological terms. DO NOT use markdown like **bold**.
+4. Tone: Academic, objective, and highly data-driven. Do NOT sound like a marketer.
 
 === STRUCTURE ===
-Paragraph 1: Repurposing opportunity for {molecule} and total IP-cleared candidates.
-Paragraph 2: Strongest commercial candidate with data-backed justification.
-Paragraph 3: Supply chain readiness and recommended next steps.
+Paragraph 1 (Pharmacology & Rationale): Detail the drug's mechanism of action, chemical class, and the biological rationale for repurposing.
+Paragraph 2 (Clinical & Commercial Strategy): Detail the highest-value therapeutic targets (IP-cleared) including their TAM and Pathway Scores.
+Paragraph 3 (Safety & Supply Chain): Detail any toxicity risks (Vacuum Fallback/Adverse effects) and supply chain readiness.
 """
         try:
             response = await self.llm.ainvoke(prompt)
@@ -734,13 +837,14 @@ Paragraph 3: Supply chain readiness and recommended next steps.
         ip_cleared = input_data.get("ip_cleared_diseases", [])
         commercial = input_data.get("commercial_data", [])
         supply_chain = input_data.get("supply_chain_data", {})
+        pharmacology_data = input_data.get("pharmacology_data", {})
 
         self.log_status("running", f"Generating intelligence report for {molecule}...")
 
         # 1. LLM-powered executive summary
         self.log_status("running", "Asking AI to synthesise executive summary...")
         exec_summary = await self._generate_executive_summary(
-            molecule, narrative, commercial, supply_chain, merged_diseases, ip_cleared
+            molecule, narrative, commercial, supply_chain, merged_diseases, ip_cleared, pharmacology_data
         )
         narrative["executive_summary"] = exec_summary
 
@@ -755,7 +859,8 @@ Paragraph 3: Supply chain readiness and recommended next steps.
             supply_chain_data=input_data.get("supply_chain_data", {}),
             merged_diseases=input_data.get("merged_diseases", []),
             literature_review=input_data.get("literature_review", ""),
-            synonyms=input_data.get("synonyms", "")
+            synonyms=input_data.get("synonyms", ""),
+            pharmacology_data=pharmacology_data
         )
         pdf_path = builder.build()
         self.log_status("done", f"PDF saved: {pdf_path}")

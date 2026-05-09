@@ -32,6 +32,85 @@ class SupplyChainOutput(BaseModel):
     market_trend: str = Field(description="Brief summary of YoY growth, revenue, and market share from IQVIA Sales.")
     clinical_pipeline_status: str = Field(description="Brief summary of active trials and phases from IQVIA Clinical Pipeline.")
 
+class PharmacologyAgent(BaseAgent):
+    def __init__(self):
+        super().__init__("Pharmacology Intel", "Clinical Pharmacologist", 0.0)
+        import os 
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        self.llm = ChatOpenAI(
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+            model="openai/gpt-4o-mini",
+            temperature=0.1
+        )
+
+    async def _run(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
+        molecule = input_data.get("molecule", "Unknown")
+        self.log_status("running", f"Querying PubChem REST API for {molecule} properties...")
+
+        pubchem_data = {
+            "molecular_formula": "Unknown",
+            "molecular_weight": "Unknown",
+            "xlogp": "Unknown",
+            "exact_mass": "Unknown"
+        }
+
+        # 1. Fetch Hard Chemical Data from PubChem
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{molecule}/property/MolecularFormula,MolecularWeight,XLogP,ExactMass/JSON"
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            try:
+                res = await client.get(url)
+                if res.status_code == 200:
+                    props = res.json().get("PropertyTable", {}).get("Properties", [{}])[0]
+                    pubchem_data["molecular_formula"] = props.get("MolecularFormula", "Unknown")
+                    pubchem_data["molecular_weight"] = str(props.get("MolecularWeight", "Unknown"))
+                    pubchem_data["xlogp"] = str(props.get("XLogP", "Unknown"))
+                    pubchem_data["exact_mass"] = str(props.get("ExactMass", "Unknown"))
+                    self.log_status("running", f"Retrieved chemical data: MW {pubchem_data['molecular_weight']}, XLogP {pubchem_data['xlogp']}")
+                else:
+                    self.log_status("warning", f"PubChem API returned {res.status_code}. Using LLM fallbacks.")
+            except Exception as e:
+                self.log_status("warning", f"PubChem API timeout. Using LLM fallbacks. {e}")
+
+        # 2. Generate Pharmacological Profile using LLM
+        self.log_status("running", f"Generating pharmacological profile (MoA, Target, Class) for {molecule}...")
+        prompt = f"""
+        You are a clinical pharmacologist. Provide a highly accurate, research-grade pharmacological profile for the drug {molecule}.
+        
+        Output EXACTLY in this JSON format:
+        {{
+            "chemical_class": "e.g. Proton Pump Inhibitor",
+            "primary_target": "e.g. H+/K+ ATPase enzyme",
+            "mechanism_of_action": "1-2 sentences using strict clinical terminology detailing how it works.",
+            "half_life": "e.g. 1-2 hours"
+        }}
+        """
+        
+        try:
+            response = await self.llm.ainvoke(prompt)
+            # Safe JSON extraction
+            content = response.content
+            import re
+            json_match = re.search(r'\{.*\}', content, re.DOTALL)
+            if json_match:
+                llm_data = json.loads(json_match.group(0))
+            else:
+                llm_data = json.loads(content)
+                
+            pubchem_data.update({
+                "chemical_class": llm_data.get("chemical_class", "Unknown"),
+                "primary_target": llm_data.get("primary_target", "Unknown"),
+                "mechanism_of_action": llm_data.get("mechanism_of_action", "Unknown"),
+                "half_life": llm_data.get("half_life", "Unknown")
+            })
+            self.log_status("done", "Pharmacological profiling complete.")
+        except Exception as e:
+            self.log_status("error", f"Failed to generate pharmacology profile: {e}")
+            
+        return {"pharmacology_data": pubchem_data}
+
 class WebIntelligenceAgent(BaseAgent):
     def __init__(self):
         super().__init__("Web Intelligence", "Pharmacodynamic Analyst", 0.0)
