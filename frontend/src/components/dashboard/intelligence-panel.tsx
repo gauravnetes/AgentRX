@@ -13,10 +13,18 @@ interface InsightData {
 }
 
 export function IntelligencePanel({ isGenerating = false, insights = null }: { isGenerating?: boolean, insights?: any }) {
+  const patentStatus = insights?.patent_freedom || "TBD";
+  const patentIsGood = patentStatus === "Clear";
+  const patentIsWarning = patentStatus === "Partially Blocked";
+
+  const viability = insights?.clinical_viability || "TBD";
+  const viabilityIsGood = viability === "High";
+  const viabilityIsWarning = viability === "Medium";
+
   const displayInsights: InsightData[] = insights ? [
-    { title: "Clinical Viability", value: insights.clinical_viability || "TBD", status: "good", icon: Target },
+    { title: "Clinical Viability", value: viability, status: viabilityIsGood ? "good" : viabilityIsWarning ? "warning" : "neutral", icon: Target },
     { title: "Est. TAM", value: `$${insights.tam || 0}B`, status: "good", icon: TrendingUp },
-    { title: "Patent Risk", value: insights.patent_freedom || "TBD", status: insights.patent_freedom === "Clear" ? "good" : "warning", icon: ShieldAlert },
+    { title: "Patent Risk", value: patentStatus, status: patentIsGood ? "good" : patentIsWarning ? "warning" : "neutral", icon: ShieldAlert },
     { title: "Repurposing Score", value: `${insights.repurposing_score || 0}/10`, status: "good", icon: Activity },
   ] : [
     { title: "Disease Target Fit", value: "--", status: "neutral", icon: Target },
@@ -24,6 +32,7 @@ export function IntelligencePanel({ isGenerating = false, insights = null }: { i
     { title: "Patent Risk", value: "--", status: "neutral", icon: ShieldAlert },
     { title: "Repurposing Score", value: "--", status: "neutral", icon: Activity },
   ];
+
 
   return (
     <div className="flex flex-col gap-4">

@@ -550,19 +550,38 @@ class CommercialViabilityAgent(BaseAgent):
     async def _fetch_financial_tam(self, disease: str) -> str:
         """Dynamically estimates the Total Addressable Market (TAM) for a specific disease using the LLM."""
         try:
-            prompt = f"""You are a healthcare financial analyst. Estimate the global Total Addressable Market (TAM) for {disease} in Billions of USD. 
-            
-            TAM ESTIMATION RULES: If you cannot find direct competitor revenue for the exact indication, you must calculate a "Proxy TAM" based on global disease burden. When outputting the TAM, you MUST append the methodology in parentheses.
+            prompt = f"""You are a healthcare financial analyst. Estimate the global Total Addressable Market (TAM) for {disease} in USD.
 
-            Example: "$3.5 Billion (Estimated via global disease burden proxy)"
-            Example: "$250 Million (Estimated via existing off-label expenditure)"
+RULES:
+- Output EXACTLY ONE LINE. Nothing else.
+- Format: "$X Billion (brief methodology note)" OR "$X Million (brief methodology note)"
+- Pick the single BEST estimate — do NOT list multiple values or ranges.
+- Example valid responses:
+  $3.5 Billion (Estimated via global disease burden proxy)
+  $250 Million (Estimated via existing off-label expenditure)
 
-            Return ONLY the realistic numeric estimate formatted exactly like the examples above. Do not include any other conversational text."""
+Output only that single line. No bullet points. No numbered lists. No extra text."""
             response = await self.llm.ainvoke(prompt)
-            estimate = response.content.strip()
-            return estimate if "Billion" in estimate else f"{estimate} Billion"
+            raw = response.content.strip()
+
+            # Extract only the FIRST "$X Billion/Million ..." pattern found in the response
+            # This guards against the LLM returning multiple bullet-point estimates
+            match = re.search(r'\$[\d,]+(?:\.\d+)?\s*(?:Billion|Million)[^$\n]*', raw, re.IGNORECASE)
+            if match:
+                estimate = match.group(0).strip()
+            else:
+                # Last resort: take just the first non-empty line
+                first_line = next((ln.strip() for ln in raw.splitlines() if ln.strip()), raw[:80])
+                estimate = first_line
+
+            # Ensure "Billion" or "Million" is present
+            if "Billion" not in estimate and "Million" not in estimate:
+                estimate = f"{estimate} Billion"
+
+            return estimate
         except Exception:
             return "$10.0 Billion (Fallback Estimate)"
+
 
     def _parse_json_safely(self, content: str) -> Dict[str, Any]:
         """Safely extracts JSON from LLM response, handling markdown code blocks and formatting."""
@@ -717,7 +736,7 @@ class CommercialViabilityAgent(BaseAgent):
                 risk_adjusted_score = max(risk_adjusted_score, 0.0)  # Floor at 0
                 
                 candidate.update({
-                    "tam_estimate": ai_data.get("tam_estimate", tam_estimate),
+                    "tam_estimate": tam_estimate,  # Always use the pre-cleaned single-value from _fetch_financial_tam
                     "trial_complexity": hard_complexity,
                     "competitors": ai_data.get("competitors", competitors),
                     "recommendation": rec_text,

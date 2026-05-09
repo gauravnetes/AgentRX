@@ -9,10 +9,11 @@ import { TelemetryFeed } from "@/components/dashboard/telemetry-feed";
 import { IntelligencePanel } from "@/components/dashboard/intelligence-panel";
 import { AssistantWidget } from "@/components/dashboard/assistant-widget";
 import { ReportView } from "@/components/dashboard/report-view";
+import { ServerCrash } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-type AppPhase = "idle" | "orchestrating" | "paused" | "report";
+type AppPhase = "idle" | "orchestrating" | "paused" | "report" | "error";
 
 type AgentStatus = "idle" | "running" | "completed";
 
@@ -58,6 +59,7 @@ export default function DashboardPage() {
   const [isPaused, setIsPaused] = useState(false);
   const [pausedMessage, setPausedMessage] = useState("");
   const [insights, setInsights] = useState<any>(null);
+  const [launchError, setLaunchError] = useState<string | null>(null);
   // sseSession is real state — incrementing it forces useEffect to re-run and open a fresh EventSource
   const [sseSession, setSseSession] = useState(0);
   const [agents, setAgents] = useState<Agent[]>([
@@ -86,22 +88,20 @@ export default function DashboardPage() {
   const fetchReportData = useCallback(async (tid: string) => {
     addLog("Pipeline complete. Fetching intelligence report...", "success");
     try {
-      if (tid !== "mock-uuid-fallback") {
-        const res = await fetch(`${API_BASE_URL}/reports/${tid}`);
-        const data = await res.json();
-        setInsights(data.insights ?? null);
-      } else {
-        setInsights({ tam: 159.7, clinical_viability: "High", patent_freedom: "Clear", final_candidates: [{ disease_name: "Breast Cancer" }] });
-      }
+      const res = await fetch(`${API_BASE_URL}/reports/${tid}`);
+      const data = await res.json();
+      // Only set real insights — never fall back to hardcoded mock data
+      setInsights(data.insights ?? null);
     } catch {
       addLog("Failed to fetch final report.", "warning");
+      setInsights(null);
     }
     setPhase("report");
   }, [addLog]);
 
   // SSE listener — re-runs when threadId changes OR when sseSession is incremented (after HITL approve)
   useEffect(() => {
-    if (phase !== "orchestrating" || !threadId || threadId === "mock-uuid-fallback") return;
+    if (phase !== "orchestrating" || !threadId) return;
 
     let es: EventSource | null = null;
     let closed = false;
@@ -184,31 +184,11 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadId, sseSession]);
 
-  // Fallback mock simulation
-  useEffect(() => {
-    if (phase !== "orchestrating" || !threadId || threadId !== "mock-uuid-fallback") return;
-    let stage = 0;
-    const iv = setInterval(() => {
-      stage++;
-      if (stage < 4) {
-        setCurrentStageIndex(stage);
-        addLog(`[Simulation] Stage ${stage} completed.`, "success");
-        setAgents(prev => prev.map((a, i) => ({
-          ...a,
-          status: i === stage ? "running" : i < stage ? "completed" : "idle",
-        })));
-      } else {
-        clearInterval(iv);
-        fetchReportData("mock-uuid-fallback");
-      }
-    }, 3000);
-    return () => clearInterval(iv);
-  }, [threadId, phase, addLog, fetchReportData]);
-
   const handleLaunch = async (input: string) => {
     setMolecule(input);
     setInsights(null);
     setIsPaused(false);
+    setLaunchError(null);
     setCurrentStageIndex(-1);
     hasApprovedRef.current = false;
     isApprovingRef.current = false;
@@ -222,6 +202,22 @@ export default function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ molecule: input }),
       });
+
+      if (res.status === 422) {
+        // Backend validation error — show it in the idle page and reset
+        const errData = await res.json();
+        const msg = errData?.detail?.message || "Invalid molecule name. Please enter a real pharmaceutical compound.";
+        setLaunchError(msg);
+        setPhase("idle");
+        return;
+      }
+
+      if (!res.ok) {
+        setLaunchError(`Backend error (${res.status}). Please check the backend is running.`);
+        setPhase("idle");
+        return;
+      }
+
       const data = await res.json();
       if (data.thread_id) {
         setThreadId(data.thread_id);
@@ -229,9 +225,10 @@ export default function DashboardPage() {
       } else {
         throw new Error("No thread_id in response");
       }
-    } catch {
-      addLog("Backend unreachable. Running in simulation mode.", "warning");
-      setThreadId("mock-uuid-fallback");
+    } catch (e: any) {
+      // Network error — backend is probably not running
+      setLaunchError("Cannot reach the backend. Make sure 'uvicorn app.main:app --reload' is running.");
+      setPhase("error");
     }
   };
 
@@ -270,9 +267,24 @@ export default function DashboardPage() {
         <AnimatePresence mode="wait">
 
           {/* Phase: Idle */}
-          {phase === "idle" && (
-            <motion.div key="idle" className="absolute inset-0" exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5 }}>
+          {(phase === "idle" || phase === "error") && (
+            <motion.div key="idle" className="absolute inset-0 flex flex-col" exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.5 }}>
               <MoleculeInput onLaunch={handleLaunch} />
+              {/* Backend error banner */}
+              <AnimatePresence>
+                {(launchError || phase === "error") && (
+                  <motion.div
+                    key="backend-err"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute bottom-6 left-6 right-6 flex items-start gap-3 px-5 py-4 rounded-xl bg-[#F87171]/8 border border-[#F87171]/20"
+                  >
+                    <ServerCrash className="w-4 h-4 text-[#F87171] shrink-0 mt-0.5" />
+                    <p className="text-sm text-[#F87171]">{launchError || "Backend is unreachable."}</p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
 

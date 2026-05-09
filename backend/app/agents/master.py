@@ -235,12 +235,57 @@ class MasterAgent:
         final_candidates = final_state.get("commercial_data", [])
         supply_chain = final_state.get("supply_chain_data", {})
 
+        # ── Split viable vs adverse candidates for accurate stats
+        def _is_adverse(c: dict) -> bool:
+            return (
+                c.get("effect_direction") == "WORSENS_OR_CAUSES"
+                or "Adverse Profile" in str(c.get("tam_estimate", ""))
+                or "SAFETY FLAG" in str(c.get("recommendation", ""))
+            )
+
+        viable_candidates  = [c for c in final_candidates if not _is_adverse(c)]
+        adverse_candidates = [c for c in final_candidates if _is_adverse(c)]
+
+        # Tag adverse candidates so the frontend can show them differently
+        for c in adverse_candidates:
+            c["is_adverse"] = True
+        for c in viable_candidates:
+            c["is_adverse"] = False
+
+        # ── TAM: max over viable candidates only
+        def _parse_tam(s: str) -> float:
+            import re
+            nums = re.findall(r'\d+\.?\d*', str(s))
+            return float(nums[0]) if nums else 0.0
+
+        tam_val = max((_parse_tam(c.get("tam_estimate", "0")) for c in viable_candidates), default=0.0) if viable_candidates else 0.0
+
+        # ── Clinical Viability: based on number of viable therapeutic targets
+        n_viable = len(viable_candidates)
+        if n_viable >= 3:
+            viability = "High"
+        elif n_viable >= 1:
+            viability = "Medium"
+        else:
+            viability = "Low"
+
+        # ── Patent Freedom: "Clear" only if all viable candidates are CLEAR
+        blocked = [c for c in viable_candidates if c.get("fto_status") == "BLOCKED"]
+        if not viable_candidates:
+            patent_status = "No Viable Targets"
+        elif blocked:
+            patent_status = "Partially Blocked"
+        else:
+            patent_status = "Clear"
+
         insights = {
-            "tam": max((float("".join(c for c in str(cand.get("tam_estimate", "0")) if c.isdigit() or c == ".") or "0") for cand in final_candidates), default=0.0) if final_candidates else 0.0,
-            "clinical_viability": "High" if final_candidates else "Low",
-            "patent_freedom": "Clear" if final_candidates else "Blocked",
+            "tam": tam_val,
+            "clinical_viability": viability,
+            "patent_freedom": patent_status,
             "repurposing_score": supply_chain.get("repurposing_score", 0.0),
-            "final_candidates": final_candidates
+            "viable_candidate_count": n_viable,
+            "adverse_candidate_count": len(adverse_candidates),
+            "final_candidates": final_candidates,  # Full list (viable + adverse tagged)
         }
 
         # Update DB Record

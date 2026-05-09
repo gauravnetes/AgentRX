@@ -16,6 +16,9 @@ interface Candidate {
   clinical_trials?: number;
   competitor_landscape?: string;
   ai_analysis?: string;
+  is_adverse?: boolean;
+  effect_direction?: string;
+  recommendation?: string;
 }
 
 interface Insights {
@@ -28,6 +31,8 @@ interface Insights {
   lead_candidate?: string;
   supply_chain_risk?: string;
   supply_chain_score?: number;
+  viable_candidate_count?: number;
+  adverse_candidate_count?: number;
 }
 
 interface ReportViewProps {
@@ -96,6 +101,11 @@ function StatusChip({ label, variant }: { label: string; variant: "success" | "w
 
 export function ReportView({ insights, threadId, molecule }: ReportViewProps) {
   const candidates: Candidate[] = insights?.final_candidates || [];
+  // Separate viable from adverse for correct display
+  const viableCandidates  = candidates.filter(c => !c.is_adverse && c.effect_direction !== "WORSENS_OR_CAUSES" && !(c.tam_estimate || "").includes("Adverse"));
+  const adverseCandidates = candidates.filter(c => c.is_adverse || c.effect_direction === "WORSENS_OR_CAUSES" || (c.tam_estimate || "").includes("Adverse"));
+  const leadCandidate     = viableCandidates[0] ?? null;
+
   const pdfUrl = threadId && threadId !== "mock-uuid-fallback"
     ? `${API_BASE_URL}/pipeline/report/${threadId}`
     : null;
@@ -103,11 +113,13 @@ export function ReportView({ insights, threadId, molecule }: ReportViewProps) {
     ? `${API_BASE_URL}/pipeline/report/${threadId}/download`
     : null;
 
-  const viabilityVariant = insights?.clinical_viability === "High" ? "success" : insights?.clinical_viability === "Medium" ? "warning" : "neutral";
-  const patentVariant = insights?.patent_freedom === "Clear" ? "success" : "danger";
+  const viabilityColor =
+    insights?.clinical_viability === "High"   ? "text-[#10B981]" :
+    insights?.clinical_viability === "Medium" ? "text-[#F59E0B]" : "text-[#F87171]";
 
-  const tamNum = insights?.tam || 0;
+  const tamNum   = insights?.tam || 0;
   const repScore = insights?.repurposing_score ?? 0;
+
 
   return (
     <motion.div
@@ -218,9 +230,15 @@ export function ReportView({ insights, threadId, molecule }: ReportViewProps) {
             </div>
             <div className="flex-1">
               <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#10B981] mb-1">Lead Candidate</div>
-              <div className="text-sm font-semibold text-white">{candidates[0]?.disease_name || "—"}</div>
-              {candidates[0]?.tam_estimate && (
-                <div className="text-[10px] text-[#475569] mt-0.5">TAM: {candidates[0].tam_estimate}</div>
+              {leadCandidate ? (
+                <>
+                  <div className="text-sm font-semibold text-white">{leadCandidate.disease_name}</div>
+                  {leadCandidate.tam_estimate && (
+                    <div className="text-[10px] text-[#475569] mt-0.5">TAM: {leadCandidate.tam_estimate}</div>
+                  )}
+                </>
+              ) : (
+                <div className="text-sm text-[#475569]">No viable targets</div>
               )}
             </div>
           </motion.div>
@@ -234,48 +252,77 @@ export function ReportView({ insights, threadId, molecule }: ReportViewProps) {
             <div className="flex items-center justify-between px-5 py-3 bg-black/40 border-b border-white/[0.04]">
               <h3 className="text-sm font-semibold text-white flex items-center gap-2">
                 <Beaker className="w-4 h-4 text-[#94A3B8]" />
-                Approved Candidates
+                Candidates
                 <span className="text-[10px] text-[#475569] font-normal ml-1">({candidates.length})</span>
               </h3>
-              <StatusChip label={`${candidates.filter(c => c.fto_status === "CLEAR" || c.fto_status === "Clear").length} FTO Clear`} variant="success" />
+              <div className="flex items-center gap-2">
+                {viableCandidates.length > 0 && (
+                  <StatusChip label={`${viableCandidates.length} Viable`} variant="success" />
+                )}
+                {adverseCandidates.length > 0 && (
+                  <StatusChip label={`${adverseCandidates.length} Adverse`} variant="danger" />
+                )}
+              </div>
             </div>
 
             {/* Candidate rows */}
             <div className="divide-y divide-white/[0.03]">
               {candidates.map((c, i) => {
-                const isClear = c.fto_status === "CLEAR" || c.fto_status === "Clear";
+                const isAdverse = c.is_adverse ||
+                  c.effect_direction === "WORSENS_OR_CAUSES" ||
+                  (c.tam_estimate || "").includes("Adverse");
+                const isClear = !isAdverse && (c.fto_status === "CLEAR" || c.fto_status === "Clear");
                 return (
                   <motion.div
                     key={i}
                     initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + i * 0.06 }}
-                    className="px-5 py-3.5 flex items-center gap-4 hover:bg-white/[0.015] transition-colors"
+                    className={`px-5 py-3.5 flex items-center gap-4 transition-colors ${
+                      isAdverse
+                        ? "bg-[#F87171]/[0.03] hover:bg-[#F87171]/[0.06] border-l-2 border-l-[#F87171]/30"
+                        : "hover:bg-white/[0.015]"
+                    }`}
                   >
-                    {/* Rank */}
-                    <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
-                      <span className="text-[11px] font-bold text-[#64748B]">{i + 1}</span>
+                    {/* Rank or warning icon */}
+                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+                      isAdverse
+                        ? "bg-[#F87171]/10 border border-[#F87171]/20"
+                        : "bg-white/[0.04] border border-white/[0.06]"
+                    }`}>
+                      {isAdverse
+                        ? <AlertTriangle className="w-3.5 h-3.5 text-[#F87171]" />
+                        : <span className="text-[11px] font-bold text-[#64748B]">{viableCandidates.indexOf(c) + 1}</span>
+                      }
                     </div>
 
                     {/* Name + AI analysis */}
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-semibold text-white truncate">{c.disease_name}</div>
-                      {c.ai_analysis && (
+                      <div className={`text-sm font-semibold truncate ${
+                        isAdverse ? "text-[#F87171]" : "text-white"
+                      }`}>{c.disease_name}</div>
+                      {isAdverse ? (
+                        <div className="text-[10px] text-[#F87171]/60 mt-0.5">Safety flag — Do not commercialize</div>
+                      ) : c.ai_analysis ? (
                         <div className="text-[10px] text-[#475569] mt-0.5 truncate">{c.ai_analysis.slice(0, 80)}…</div>
-                      )}
+                      ) : null}
                     </div>
 
                     {/* TAM */}
                     <div className="text-right shrink-0 w-24">
-                      <div className="text-xs font-semibold text-white">{c.tam_estimate || "—"}</div>
+                      <div className={`text-xs font-semibold ${
+                        isAdverse ? "text-[#F87171]/60" : "text-white"
+                      }`}>{c.tam_estimate || "—"}</div>
                       <div className="text-[9px] text-[#334155]">TAM</div>
                     </div>
 
-                    {/* FTO */}
+                    {/* Status chip */}
                     <div className="shrink-0">
-                      {isClear
-                        ? <StatusChip label="FTO CLEAR" variant="success" />
-                        : <StatusChip label={c.fto_status || "Pending"} variant="warning" />
+                      {isAdverse
+                        ? <StatusChip label="SAFETY FLAG" variant="danger" />
+                        : isClear
+                          ? <StatusChip label="FTO CLEAR" variant="success" />
+                          : <StatusChip label={c.fto_status || "Pending"} variant="warning" />
                       }
                     </div>
                   </motion.div>

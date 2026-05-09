@@ -29,9 +29,8 @@ export default function AgentCard({ name, status = "idle", activity = "0 tasks" 
       {/* Progress/activity bar placeholder */}
       <div className="h-1 bg-gray-800 rounded overflow-hidden">
         <div
-          className={`h-full ${
-            status === "active" ? "bg-green-900/50 w-2/3" : "bg-gray-700 w-1/4"
-          }`}
+          className={`h-full ${status === "active" ? "bg-green-900/50 w-2/3" : "bg-gray-700 w-1/4"
+            }`}
         />
       </div>
     </div>

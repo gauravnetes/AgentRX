@@ -28,11 +28,10 @@ export default function Sidebar() {
         {navItems.map((item) => (
           <div
             key={item.id}
-            className={`group px-3 py-2 rounded-md transition-all duration-200 cursor-pointer flex items-center gap-3 ${
-              item.active 
-                ? "bg-blue-500/10 border border-blue-500/20 text-blue-400" 
-                : "text-muted hover:text-foreground hover:bg-[#1a1a1a]"
-            }`}
+            className={`group px-3 py-2 rounded-md transition-all duration-200 cursor-pointer flex items-center gap-3 ${item.active
+              ? "bg-blue-500/10 border border-blue-500/20 text-blue-400"
+              : "text-muted hover:text-foreground hover:bg-[#1a1a1a]"
+              }`}
           >
             <MonoText className={`text-[10px] ${item.active ? "text-blue-500" : "opacity-40"}`}>
               {item.id}

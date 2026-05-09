@@ -35,13 +35,12 @@ export default function MetricsGrid({ metrics }: MetricsGridProps) {
               <span className="text-xl font-mono text-gray-100">{metric.value}</span>
               {metric.trend && (
                 <span
-                  className={`text-xs ${
-                    metric.trend === "up"
-                      ? "text-green-500"
-                      : metric.trend === "down"
+                  className={`text-xs ${metric.trend === "up"
+                    ? "text-green-500"
+                    : metric.trend === "down"
                       ? "text-red-500"
                       : "text-gray-500"
-                  }`}
+                    }`}
                 >
                   {metric.trend === "up" && "▲"}
                   {metric.trend === "down" && "▼"}
