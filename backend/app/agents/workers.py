@@ -57,9 +57,13 @@ class PharmacologyAgent(BaseAgent):
             "exact_mass": "Unknown"
         }
 
-        # 1. Fetch Hard Chemical Data from PubChem
-        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{molecule}/property/MolecularFormula,MolecularWeight,XLogP,ExactMass/JSON"
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        pubchem_ok = False
+
+        # 1. Fetch Hard Chemical Data from PubChem (URL-encode the molecule name)
+        import urllib.parse
+        encoded_name = urllib.parse.quote(molecule, safe="")
+        url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{encoded_name}/property/MolecularFormula,MolecularWeight,XLogP,ExactMass/JSON"
+        async with httpx.AsyncClient(timeout=20.0) as client:
             try:
                 res = await client.get(url)
                 if res.status_code == 200:
@@ -68,29 +72,47 @@ class PharmacologyAgent(BaseAgent):
                     pubchem_data["molecular_weight"] = str(props.get("MolecularWeight", "Unknown"))
                     pubchem_data["xlogp"] = str(props.get("XLogP", "Unknown"))
                     pubchem_data["exact_mass"] = str(props.get("ExactMass", "Unknown"))
+                    pubchem_ok = True
                     self.log_status("running", f"Retrieved chemical data: MW {pubchem_data['molecular_weight']}, XLogP {pubchem_data['xlogp']}")
                 else:
-                    self.log_status("warning", f"PubChem API returned {res.status_code}. Using LLM fallbacks.")
+                    self.log_status("warning", f"PubChem API returned {res.status_code}. Will use LLM fallback for chemical data.")
             except Exception as e:
-                self.log_status("warning", f"PubChem API timeout. Using LLM fallbacks. {e}")
+                self.log_status("warning", f"PubChem API error: {e}. Will use LLM fallback for chemical data.")
 
         # 2. Generate Pharmacological Profile using LLM
+        # If PubChem failed, also ask the LLM for molecular formula/weight/xlogp
         self.log_status("running", f"Generating pharmacological profile (MoA, Target, Class) for {molecule}...")
-        prompt = f"""
-        You are a clinical pharmacologist. Provide a highly accurate, research-grade pharmacological profile for the drug {molecule}.
+
+        if pubchem_ok:
+            # PubChem succeeded — only need the clinical fields from LLM
+            prompt = f"""You are a clinical pharmacologist. Provide a highly accurate, research-grade pharmacological profile for the drug {molecule}.
         
-        Output EXACTLY in this JSON format:
-        {{
-            "chemical_class": "e.g. Proton Pump Inhibitor",
-            "primary_target": "e.g. H+/K+ ATPase enzyme",
-            "mechanism_of_action": "1-2 sentences using strict clinical terminology detailing how it works.",
-            "half_life": "e.g. 1-2 hours"
-        }}
-        """
-        
+Output EXACTLY in this JSON format:
+{{
+    "chemical_class": "e.g. Proton Pump Inhibitor",
+    "primary_target": "e.g. H+/K+ ATPase enzyme",
+    "mechanism_of_action": "1-2 sentences using strict clinical terminology detailing how it works.",
+    "half_life": "e.g. 1-2 hours"
+}}"""
+        else:
+            # PubChem failed — ask LLM for ALL fields including chemical data
+            prompt = f"""You are a clinical pharmacologist with encyclopedic knowledge of drug chemistry. Provide a highly accurate, research-grade pharmacological profile for the drug {molecule}.
+
+IMPORTANT: PubChem lookup failed for this molecule. You MUST provide the molecular formula, molecular weight, and lipophilicity from your training data.
+
+Output EXACTLY in this JSON format:
+{{
+    "molecular_formula": "e.g. C9H8O4 (the exact molecular formula)",
+    "molecular_weight": "e.g. 180.16 (numeric value in g/mol)",
+    "xlogp": "e.g. 1.2 (numeric XLogP value)",
+    "chemical_class": "e.g. Proton Pump Inhibitor",
+    "primary_target": "e.g. H+/K+ ATPase enzyme",
+    "mechanism_of_action": "1-2 sentences using strict clinical terminology detailing how it works.",
+    "half_life": "e.g. 1-2 hours"
+}}"""
+
         try:
             response = await self.llm.ainvoke(prompt)
-            # Safe JSON extraction
             content = response.content
             import re
             json_match = re.search(r'\{.*\}', content, re.DOTALL)
@@ -98,7 +120,16 @@ class PharmacologyAgent(BaseAgent):
                 llm_data = json.loads(json_match.group(0))
             else:
                 llm_data = json.loads(content)
-                
+
+            # If PubChem failed, pull chemical data from LLM response
+            if not pubchem_ok:
+                if llm_data.get("molecular_formula") and llm_data["molecular_formula"] != "Unknown":
+                    pubchem_data["molecular_formula"] = llm_data["molecular_formula"]
+                if llm_data.get("molecular_weight") and llm_data["molecular_weight"] != "Unknown":
+                    pubchem_data["molecular_weight"] = str(llm_data["molecular_weight"])
+                if llm_data.get("xlogp") and llm_data["xlogp"] != "Unknown":
+                    pubchem_data["xlogp"] = str(llm_data["xlogp"])
+
             pubchem_data.update({
                 "chemical_class": llm_data.get("chemical_class", "Unknown"),
                 "primary_target": llm_data.get("primary_target", "Unknown"),
