@@ -12,14 +12,19 @@ interface InsightData {
   icon: React.ElementType;
 }
 
-const insights: InsightData[] = [
-  { title: "Disease Target Fit", value: "87%", trend: "+12%", status: "good", icon: Target },
-  { title: "Est. TAM", value: "$4.2B", status: "good", icon: TrendingUp },
-  { title: "Patent Risk", value: "Medium", status: "warning", icon: ShieldAlert },
-  { title: "Confidence Score", value: "92%", trend: "High", status: "good", icon: Activity },
-];
+export function IntelligencePanel({ isGenerating = false, insights = null }: { isGenerating?: boolean, insights?: any }) {
+  const displayInsights: InsightData[] = insights ? [
+    { title: "Clinical Viability", value: insights.clinical_viability || "TBD", status: "good", icon: Target },
+    { title: "Est. TAM", value: `$${insights.tam || 0}B`, status: "good", icon: TrendingUp },
+    { title: "Patent Risk", value: insights.patent_freedom || "TBD", status: insights.patent_freedom === "Clear" ? "good" : "warning", icon: ShieldAlert },
+    { title: "Repurposing Score", value: `${insights.repurposing_score || 0}/10`, status: "good", icon: Activity },
+  ] : [
+    { title: "Disease Target Fit", value: "--", status: "neutral", icon: Target },
+    { title: "Est. TAM", value: "--", status: "neutral", icon: TrendingUp },
+    { title: "Patent Risk", value: "--", status: "neutral", icon: ShieldAlert },
+    { title: "Repurposing Score", value: "--", status: "neutral", icon: Activity },
+  ];
 
-export function IntelligencePanel({ isGenerating = false }: { isGenerating?: boolean }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between mb-2">
@@ -33,7 +38,7 @@ export function IntelligencePanel({ isGenerating = false }: { isGenerating?: boo
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {insights.map((insight, i) => {
+        {displayInsights.map((insight, i) => {
           const Icon = insight.icon;
           return (
             <motion.div

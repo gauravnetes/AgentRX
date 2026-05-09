@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Terminal } from "lucide-react";
+import { Terminal, Maximize2, Minimize2 } from "lucide-react";
 
 interface LogEntry {
   id: string;
@@ -17,18 +17,30 @@ interface TelemetryFeedProps {
 
 export function TelemetryFeed({ logs }: TelemetryFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [logs]);
+  }, [logs, isExpanded]);
 
   return (
-    <div className="w-full h-48 bg-[#0B0F1A]/80 border border-white/[0.04] rounded-2xl flex flex-col overflow-hidden backdrop-blur-md">
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-white/[0.04] bg-[#10131F]/50">
-        <Terminal className="w-4 h-4 text-[#64748B]" />
-        <span className="text-xs font-medium text-[#94A3B8] tracking-widest uppercase">Live Telemetry</span>
+    <motion.div 
+      layout
+      className={`w-full bg-[#0B0F1A]/80 border border-white/[0.04] rounded-2xl flex flex-col overflow-hidden backdrop-blur-md transition-all duration-300 ${isExpanded ? 'h-96 absolute bottom-6 left-6 right-[404px] z-40 shadow-2xl' : 'h-48 relative'}`}
+    >
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/[0.04] bg-[#10131F]/50">
+        <div className="flex items-center gap-2">
+          <Terminal className="w-4 h-4 text-[#64748B]" />
+          <span className="text-xs font-medium text-[#94A3B8] tracking-widest uppercase">Live Telemetry</span>
+        </div>
+        <button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="p-1 hover:bg-white/10 rounded text-[#64748B] hover:text-white transition-colors"
+        >
+          {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </button>
       </div>
       
       <div 
@@ -58,6 +70,6 @@ export function TelemetryFeed({ logs }: TelemetryFeedProps) {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }
