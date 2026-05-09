@@ -242,15 +242,14 @@ async def get_pipeline_status(thread_id: str):
 
 
 # ---------------------------------------------------------------------------
-# GET /report/{thread_id} — Download the generated PDF report
+# GET /report/{thread_id} — Inline PDF preview (for iframe embedding)
 # ---------------------------------------------------------------------------
 
 @router.get("/report/{thread_id}")
-async def download_report(thread_id: str):
+async def preview_report(thread_id: str):
     """
-    Download the generated PDF intelligence report for a completed pipeline run.
-
-    Returns the PDF as a file attachment.
+    Serve the PDF inline so browsers/iframes can render it directly.
+    Content-Disposition is 'inline', not 'attachment'.
     """
     reports_dir = Path(__file__).parent.parent.parent.parent / "reports"
     pdf_path = reports_dir / f"{thread_id}.pdf"
@@ -258,8 +257,34 @@ async def download_report(thread_id: str):
     if not pdf_path.exists():
         raise HTTPException(
             status_code=404,
-            detail=f"No report found for thread_id={thread_id}. "
-                   f"Ensure the pipeline has completed successfully."
+            detail=f"No report found for thread_id={thread_id}."
+        )
+
+    from fastapi.responses import Response
+    content = pdf_path.read_bytes()
+    return Response(
+        content=content,
+        media_type="application/pdf",
+        headers={"Content-Disposition": "inline"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# GET /report/{thread_id}/download — Force attachment download
+# ---------------------------------------------------------------------------
+
+@router.get("/report/{thread_id}/download")
+async def download_report(thread_id: str):
+    """
+    Force-download the PDF as a file attachment.
+    """
+    reports_dir = Path(__file__).parent.parent.parent.parent / "reports"
+    pdf_path = reports_dir / f"{thread_id}.pdf"
+
+    if not pdf_path.exists():
+        raise HTTPException(
+            status_code=404,
+            detail=f"No report found for thread_id={thread_id}."
         )
 
     return FileResponse(

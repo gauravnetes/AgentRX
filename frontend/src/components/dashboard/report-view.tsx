@@ -2,12 +2,20 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FileText, Download, Target, ShieldCheck, TrendingUp, Package, Users, ChevronRight } from "lucide-react";
+import {
+  FileText, Download, Target, ShieldCheck, TrendingUp,
+  Package, Beaker, Activity, BarChart3, Zap,
+  CheckCircle2, AlertTriangle, ArrowRight
+} from "lucide-react";
 
 interface Candidate {
   disease_name: string;
   tam_estimate?: string;
   fto_status?: string;
+  trial_complexity_score?: number;
+  clinical_trials?: number;
+  competitor_landscape?: string;
+  ai_analysis?: string;
 }
 
 interface Insights {
@@ -30,13 +38,59 @@ interface ReportViewProps {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
 
-function ScoreCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
+/* ── Animated radial gauge ── */
+function Gauge({ value, max, color, size = 64 }: { value: number; max: number; color: string; size?: number }) {
+  const radius = (size - 8) / 2;
+  const circ = 2 * Math.PI * radius;
+  const pct = Math.min(value / max, 1);
+  const dashOffset = circ * (1 - pct);
+
   return (
-    <div className="p-5 rounded-xl bg-black/40 border border-white/[0.08] flex flex-col gap-1">
-      <span className="text-xs font-medium text-[#94A3B8] uppercase tracking-wider">{label}</span>
-      <span className={`text-3xl font-bold tracking-tight ${color}`}>{value}</span>
-      <span className="text-xs text-[#475569]">{sub}</span>
+    <svg width={size} height={size} className="shrink-0">
+      <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={4} />
+      <motion.circle
+        cx={size / 2} cy={size / 2} r={radius}
+        fill="none" stroke={color} strokeWidth={4} strokeLinecap="round"
+        strokeDasharray={circ}
+        initial={{ strokeDashoffset: circ }}
+        animate={{ strokeDashoffset: dashOffset }}
+        transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+      <text x={size / 2} y={size / 2} textAnchor="middle" dominantBaseline="central" fill="white" fontSize={size * 0.22} fontWeight={700}>
+        {value}
+      </text>
+    </svg>
+  );
+}
+
+/* ── Mini progress bar ── */
+function MiniBar({ value, color }: { value: number; color: string }) {
+  return (
+    <div className="w-full h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.min(value, 100)}%` }}
+        transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        className="h-full rounded-full"
+        style={{ background: color }}
+      />
     </div>
+  );
+}
+
+/* ── Status chip ── */
+function StatusChip({ label, variant }: { label: string; variant: "success" | "warning" | "danger" | "neutral" }) {
+  const map = {
+    success: "text-[#10B981] bg-[#10B981]/10 border-[#10B981]/20",
+    warning: "text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/20",
+    danger:  "text-[#F87171] bg-[#F87171]/10 border-[#F87171]/20",
+    neutral: "text-[#94A3B8] bg-white/5 border-white/10",
+  };
+  return (
+    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border ${map[variant]}`}>
+      {label}
+    </span>
   );
 }
 
@@ -45,181 +99,250 @@ export function ReportView({ insights, threadId, molecule }: ReportViewProps) {
   const pdfUrl = threadId && threadId !== "mock-uuid-fallback"
     ? `${API_BASE_URL}/pipeline/report/${threadId}`
     : null;
+  const dlUrl = threadId && threadId !== "mock-uuid-fallback"
+    ? `${API_BASE_URL}/pipeline/report/${threadId}/download`
+    : null;
 
-  const viabilityColor = insights?.clinical_viability === "High" ? "text-[#10B981]"
-    : insights?.clinical_viability === "Medium" ? "text-[#F59E0B]"
-    : "text-[#94A3B8]";
+  const viabilityVariant = insights?.clinical_viability === "High" ? "success" : insights?.clinical_viability === "Medium" ? "warning" : "neutral";
+  const patentVariant = insights?.patent_freedom === "Clear" ? "success" : "danger";
 
-  const patentColor = insights?.patent_freedom === "Clear" ? "text-[#F59E0B]" : "text-[#F87171]";
+  const tamNum = insights?.tam || 0;
+  const repScore = insights?.repurposing_score ?? 0;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full h-full flex flex-col bg-[#050816]/30 rounded-2xl border border-white/[0.04] overflow-hidden"
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="w-full h-full flex flex-col overflow-hidden"
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-white/[0.04] bg-[#10131F]/50 shrink-0">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between px-6 py-4 shrink-0 border-b border-white/[0.04]">
         <div>
-          <h2 className="text-2xl font-semibold text-[#F5F7FA] tracking-tight">Intelligence Report Generated</h2>
-          <p className="text-sm text-[#94A3B8] mt-1">
-            Multi-agent analysis completed for <span className="text-white font-medium">{molecule || "molecule"}</span> across 4 pipelines.
+          <div className="flex items-center gap-2.5 mb-1">
+            <div className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#10B981]">Report Ready</span>
+          </div>
+          <h2 className="text-xl font-semibold text-white tracking-tight">
+            {molecule || "Molecule"} Intelligence Report
+          </h2>
+          <p className="text-xs text-[#475569] mt-0.5">
+            Multi-agent analysis across 6 pipeline stages • {candidates.length} candidate{candidates.length !== 1 ? "s" : ""} evaluated
           </p>
         </div>
-        <div className="flex gap-3">
-          {pdfUrl ? (
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-neutral-100 text-sm font-semibold text-black transition-all"
-            >
-              <Download className="w-4 h-4" />
-              Export PDF
+        <div className="flex gap-2">
+          {pdfUrl && (
+            <a href={pdfUrl} target="_blank" rel="noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 text-xs text-white transition-colors">
+              <FileText className="w-3.5 h-3.5" /> View PDF
             </a>
-          ) : (
-            <button disabled className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-sm text-[#94A3B8] cursor-not-allowed">
-              <Download className="w-4 h-4" />
-              Export PDF
-            </button>
+          )}
+          {dlUrl && (
+            <a href={dlUrl} download
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-white hover:bg-neutral-100 text-xs font-semibold text-black transition-colors">
+              <Download className="w-3.5 h-3.5" /> Export PDF
+            </a>
           )}
         </div>
       </div>
 
-      {/* Scrollable Content */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+      {/* ── Scrollable Body ── */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-5">
 
-        {/* Score Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <ScoreCard
-            label="Clinical Viability"
-            value={insights?.clinical_viability || "—"}
-            sub="Based on PubMed pathway analysis"
-            color={viabilityColor}
-          />
-          <ScoreCard
-            label="Patent Freedom"
-            value={insights?.patent_freedom || "—"}
-            sub="Europe PMC FTO clearance"
-            color={patentColor}
-          />
-          <ScoreCard
-            label="Market Potential (TAM)"
-            value={insights?.tam ? `$${insights.tam}B` : "—"}
-            sub="Big Pharma proxy revenue estimate"
-            color="text-[#F5F7FA]"
-          />
+        {/* ━━ KPI Hero Row ━━ */}
+        <div className="grid grid-cols-4 gap-3">
+          {/* TAM */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+            className="p-4 rounded-xl bg-gradient-to-br from-[#6366F1]/10 to-transparent border border-[#6366F1]/15">
+            <div className="flex items-center gap-1.5 mb-3">
+              <BarChart3 className="w-3.5 h-3.5 text-[#6366F1]" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#6366F1]">Total Market</span>
+            </div>
+            <div className="text-3xl font-bold text-white tracking-tight">
+              {tamNum > 0 ? `$${tamNum}` : "—"}
+              {tamNum > 0 && <span className="text-lg text-[#6366F1] ml-0.5">B</span>}
+            </div>
+            <div className="text-[10px] text-[#475569] mt-1">Addressable Market (TAM)</div>
+          </motion.div>
+
+          {/* Viability */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="p-4 rounded-xl bg-gradient-to-br from-[#10B981]/10 to-transparent border border-[#10B981]/15">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Activity className="w-3.5 h-3.5 text-[#10B981]" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#10B981]">Viability</span>
+            </div>
+            <div className="text-3xl font-bold text-white tracking-tight">{insights?.clinical_viability || "—"}</div>
+            <div className="text-[10px] text-[#475569] mt-1">Clinical viability rating</div>
+          </motion.div>
+
+          {/* Patent */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="p-4 rounded-xl bg-gradient-to-br from-[#F59E0B]/10 to-transparent border border-[#F59E0B]/15">
+            <div className="flex items-center gap-1.5 mb-3">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F59E0B]" />
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#F59E0B]">Patent</span>
+            </div>
+            <div className="text-3xl font-bold text-white tracking-tight">{insights?.patent_freedom || "—"}</div>
+            <div className="text-[10px] text-[#475569] mt-1">FTO clearance status</div>
+          </motion.div>
+
+          {/* Repurposing Score Gauge */}
+          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="p-4 rounded-xl bg-gradient-to-br from-[#EC4899]/10 to-transparent border border-[#EC4899]/15 flex items-center gap-4">
+            <Gauge value={Math.round(repScore)} max={10} color="#EC4899" />
+            <div>
+              <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#EC4899]">Score</span>
+              <div className="text-[10px] text-[#475569] mt-0.5 leading-snug">Repurposing Potential</div>
+            </div>
+          </motion.div>
         </div>
 
-        {/* Extra KPIs */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="p-4 rounded-xl bg-black/30 border border-white/[0.06] flex items-center gap-3">
-            <Package className="w-5 h-5 text-[#94A3B8] shrink-0" />
-            <div>
-              <div className="text-xs text-[#64748B] uppercase tracking-wider mb-0.5">Supply Chain</div>
-              <div className="text-sm font-medium text-white">{insights?.supply_chain_risk || "No data"}</div>
+        {/* ━━ Supply Chain + Lead Info ━━ */}
+        <div className="grid grid-cols-2 gap-3">
+          <motion.div initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}
+            className="p-4 rounded-xl border border-white/[0.06] bg-black/30 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-[#06B6D4]/10 border border-[#06B6D4]/20 flex items-center justify-center shrink-0">
+              <Package className="w-5 h-5 text-[#06B6D4]" />
             </div>
-          </div>
-          <div className="p-4 rounded-xl bg-black/30 border border-white/[0.06] flex items-center gap-3">
-            <TrendingUp className="w-5 h-5 text-[#94A3B8] shrink-0" />
-            <div>
-              <div className="text-xs text-[#64748B] uppercase tracking-wider mb-0.5">Repurposing Score</div>
-              <div className="text-sm font-medium text-white">
-                {insights?.repurposing_score != null ? `${insights.repurposing_score}/10` : "—"}
-              </div>
+            <div className="flex-1">
+              <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#06B6D4] mb-1">Supply Chain</div>
+              <div className="text-sm font-semibold text-white">{insights?.supply_chain_risk || "Analysing…"}</div>
             </div>
-          </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.35 }}
+            className="p-4 rounded-xl border border-white/[0.06] bg-black/30 flex items-center gap-4">
+            <div className="w-10 h-10 rounded-xl bg-[#10B981]/10 border border-[#10B981]/20 flex items-center justify-center shrink-0">
+              <Target className="w-5 h-5 text-[#10B981]" />
+            </div>
+            <div className="flex-1">
+              <div className="text-[9px] font-bold uppercase tracking-[0.14em] text-[#10B981] mb-1">Lead Candidate</div>
+              <div className="text-sm font-semibold text-white">{candidates[0]?.disease_name || "—"}</div>
+              {candidates[0]?.tam_estimate && (
+                <div className="text-[10px] text-[#475569] mt-0.5">TAM: {candidates[0].tam_estimate}</div>
+              )}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Candidate List */}
+        {/* ━━ Candidate Table ━━ */}
         {candidates.length > 0 && (
-          <div className="p-5 rounded-xl bg-black/20 border border-white/[0.04]">
-            <h3 className="text-base font-semibold text-[#F5F7FA] mb-4 flex items-center gap-2">
-              <Users className="w-4 h-4 text-[#94A3B8]" />
-              Approved Repurposing Candidates ({candidates.length})
-            </h3>
-            <div className="space-y-2">
-              {candidates.map((c, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-black/30 border border-white/[0.06]"
-                >
-                  <div className="flex items-center gap-3">
-                    <Target className="w-4 h-4 text-[#10B981] shrink-0" />
-                    <span className="text-sm text-[#F5F7FA] font-medium">{c.disease_name}</span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {c.tam_estimate && (
-                      <span className="text-xs text-[#94A3B8]">{c.tam_estimate}</span>
-                    )}
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      c.fto_status === "CLEAR" || c.fto_status === "Clear"
-                        ? "text-[#10B981] bg-[#10B981]/10"
-                        : "text-[#F59E0B] bg-[#F59E0B]/10"
-                    }`}>
-                      {c.fto_status || "FTO Pending"}
-                    </span>
-                  </div>
-                </motion.div>
-              ))}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}
+            className="rounded-xl border border-white/[0.06] overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 bg-black/40 border-b border-white/[0.04]">
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <Beaker className="w-4 h-4 text-[#94A3B8]" />
+                Approved Candidates
+                <span className="text-[10px] text-[#475569] font-normal ml-1">({candidates.length})</span>
+              </h3>
+              <StatusChip label={`${candidates.filter(c => c.fto_status === "CLEAR" || c.fto_status === "Clear").length} FTO Clear`} variant="success" />
             </div>
-          </div>
+
+            {/* Candidate rows */}
+            <div className="divide-y divide-white/[0.03]">
+              {candidates.map((c, i) => {
+                const isClear = c.fto_status === "CLEAR" || c.fto_status === "Clear";
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4 + i * 0.06 }}
+                    className="px-5 py-3.5 flex items-center gap-4 hover:bg-white/[0.015] transition-colors"
+                  >
+                    {/* Rank */}
+                    <div className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
+                      <span className="text-[11px] font-bold text-[#64748B]">{i + 1}</span>
+                    </div>
+
+                    {/* Name + AI analysis */}
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-semibold text-white truncate">{c.disease_name}</div>
+                      {c.ai_analysis && (
+                        <div className="text-[10px] text-[#475569] mt-0.5 truncate">{c.ai_analysis.slice(0, 80)}…</div>
+                      )}
+                    </div>
+
+                    {/* TAM */}
+                    <div className="text-right shrink-0 w-24">
+                      <div className="text-xs font-semibold text-white">{c.tam_estimate || "—"}</div>
+                      <div className="text-[9px] text-[#334155]">TAM</div>
+                    </div>
+
+                    {/* FTO */}
+                    <div className="shrink-0">
+                      {isClear
+                        ? <StatusChip label="FTO CLEAR" variant="success" />
+                        : <StatusChip label={c.fto_status || "Pending"} variant="warning" />
+                      }
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
         )}
 
-        {/* Executive Summary */}
-        <div className="p-6 rounded-xl bg-black/20 border border-white/[0.04]">
-          <h3 className="text-base font-semibold text-[#F5F7FA] mb-4 flex items-center gap-2">
+        {/* ━━ Executive Summary ━━ */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+          className="rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="px-5 py-3 bg-black/40 border-b border-white/[0.04] flex items-center gap-2">
             <FileText className="w-4 h-4 text-[#94A3B8]" />
-            Executive Summary
-          </h3>
-          <div className="text-sm text-[#94A3B8] leading-relaxed">
-            {insights?.executive_summary
-              ? <p>{insights.executive_summary}</p>
-              : (
-                <div className="space-y-3">
-                  <p>The multi-agent orchestration successfully mapped the target molecule across PubMed, Europe PMC, FDA ClinicalTrials, YFinance and IQVIA datasets.</p>
-                  {candidates.length > 0 && (
-                    <p><strong className="text-white">Lead Candidate:</strong> {candidates[0]?.disease_name} — FTO cleared and commercially viable at {candidates[0]?.tam_estimate || "significant"} TAM.</p>
-                  )}
-                  <p><strong className="text-white">Patent Landscape:</strong> {insights?.patent_freedom === "Clear"
-                    ? "No biological patent conflicts found. IP space is clear to proceed."
-                    : "Patent conflicts detected. Initiate FTO review before commercialisation."
-                  }</p>
-                </div>
-              )
-            }
+            <h3 className="text-sm font-semibold text-white">Executive Summary</h3>
           </div>
-        </div>
+          <div className="px-5 py-4">
+            <div className="text-sm text-[#94A3B8] leading-relaxed">
+              {insights?.executive_summary
+                ? <p>{insights.executive_summary}</p>
+                : (
+                  <div className="space-y-3">
+                    <p>Multi-agent orchestration successfully mapped <strong className="text-white">{molecule || "the target molecule"}</strong> across PubMed, Europe PMC, FDA ClinicalTrials, YFinance and IQVIA datasets.</p>
+                    {candidates.length > 0 && (
+                      <p>
+                        <strong className="text-white">Lead Candidate:</strong> {candidates[0]?.disease_name} — FTO cleared and commercially viable at {candidates[0]?.tam_estimate || "significant"} TAM.
+                      </p>
+                    )}
+                    <p>
+                      <strong className="text-white">Patent Status:</strong> {insights?.patent_freedom === "Clear"
+                        ? "No biological patent conflicts detected. IP space is clear."
+                        : "Patent conflicts exist. Initiate FTO review before commercialisation."
+                      }
+                    </p>
+                  </div>
+                )
+              }
+            </div>
+          </div>
+        </motion.div>
 
-        {/* Actions */}
-        <div className="p-5 rounded-xl bg-black/20 border border-white/[0.04]">
-          <h3 className="text-base font-semibold text-[#F5F7FA] mb-4 flex items-center gap-2">
-            <ChevronRight className="w-4 h-4 text-[#94A3B8]" />
-            Recommended Actions
-          </h3>
-          <ul className="space-y-3">
+        {/* ━━ Next Steps ━━ */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }}
+          className="rounded-xl border border-white/[0.06] overflow-hidden">
+          <div className="px-5 py-3 bg-black/40 border-b border-white/[0.04] flex items-center gap-2">
+            <Zap className="w-4 h-4 text-[#F59E0B]" />
+            <h3 className="text-sm font-semibold text-white">Recommended Actions</h3>
+          </div>
+          <div className="px-5 py-4 space-y-3">
             {candidates.length > 0 && (
-              <li className="flex items-start gap-3 text-sm text-[#94A3B8]">
-                <ShieldCheck className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 text-sm text-[#94A3B8]">
+                <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
                 <span>Proceed to pre-clinical validation for <strong className="text-white">{candidates[0]?.disease_name}</strong> — top-ranked lead candidate.</span>
-              </li>
+              </div>
             )}
-            <li className="flex items-start gap-3 text-sm text-[#94A3B8]">
-              <TrendingUp className="w-4 h-4 text-[#94A3B8] shrink-0 mt-0.5" />
+            <div className="flex items-start gap-3 text-sm text-[#94A3B8]">
+              <TrendingUp className="w-4 h-4 text-[#6366F1] shrink-0 mt-0.5" />
               <span>Commission detailed IQVIA market study for TAM validation across {candidates.length || "identified"} indication{candidates.length !== 1 ? "s" : ""}.</span>
-            </li>
+            </div>
             {pdfUrl && (
-              <li className="flex items-start gap-3 text-sm text-[#94A3B8]">
-                <FileText className="w-4 h-4 text-[#94A3B8] shrink-0 mt-0.5" />
-                <span>Full AI-synthesised PDF report is ready. <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-white underline underline-offset-2">Download report →</a></span>
-              </li>
+              <div className="flex items-start gap-3 text-sm text-[#94A3B8]">
+                <ArrowRight className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
+                <span>Full AI-synthesised report is ready. <a href={pdfUrl} target="_blank" rel="noreferrer" className="text-white underline underline-offset-2">Open PDF →</a></span>
+              </div>
             )}
-          </ul>
-        </div>
+          </div>
+        </motion.div>
 
       </div>
     </motion.div>
