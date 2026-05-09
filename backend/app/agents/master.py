@@ -236,7 +236,7 @@ class MasterAgent:
         supply_chain = final_state.get("supply_chain_data", {})
 
         insights = {
-            "tam": max((float("".join(c for c in str(cand.get("tam_estimate", "0")) if c.isdigit() or c == ".")) for cand in final_candidates), default=0.0) if final_candidates else 0.0,
+            "tam": max((float("".join(c for c in str(cand.get("tam_estimate", "0")) if c.isdigit() or c == ".") or "0") for cand in final_candidates), default=0.0) if final_candidates else 0.0,
             "clinical_viability": "High" if final_candidates else "Low",
             "patent_freedom": "Clear" if final_candidates else "Blocked",
             "repurposing_score": supply_chain.get("repurposing_score", 0.0),

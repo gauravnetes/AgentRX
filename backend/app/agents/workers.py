@@ -64,8 +64,8 @@ class WebIntelligenceAgent(BaseAgent):
             synonyms = molecule
             
         aliases_string = f"{molecule} OR {synonyms}"
-        search_query = f"({aliases_string}) AND (repurposing[Title/Abstract] OR novel therapeutic[Title/Abstract] OR off-label[Title/Abstract] OR therapeutic potential[Title/Abstract] OR mechanism of action[Title/Abstract])"
-        self.log_status("running", f"Connecting to PubMed API. Broadened query: {search_query[:50]}...")
+        search_query = f"({aliases_string})[Title/Abstract]"
+        self.log_status("running", f"Connecting to PubMed API. Broadened neutral query: {search_query[:50]}...")
         
         # --- 2. Broadened E-Search ---
         search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
@@ -73,7 +73,7 @@ class WebIntelligenceAgent(BaseAgent):
             "db": "pubmed",
             "term": search_query,
             "retmode": "json",
-            "retmax": 15 # Fetching up to 15 papers for massive context
+            "retmax": 20  # Fetching up to 20 papers for richer Risk/Reward matrix context
         }
         
         async with httpx.AsyncClient(follow_redirects=True) as client:
@@ -131,44 +131,129 @@ class WebIntelligenceAgent(BaseAgent):
         fetched_pmids = _re.findall(r'\[VALID PMID: (\d+)\]', literature_context)
         pmid_hint = ', '.join([f'[VALID PMID: {p}]' for p in fetched_pmids]) if fetched_pmids else 'No PMIDs found in abstracts'
         
-        self.log_status("running", "AI reasoning over fetched abstracts to calculate pathway overlap...")
+        # PHASE 1: Neutral Literature Review
+        self.log_status("running", "Phase 1: Generating neutral literature review to prevent bias...")
         
-        prompt = f"""
-        You are an expert computational biologist and pharmacologist.
-        Target Molecule: {molecule} (Synonyms: {synonyms})
-
+        phase_1_prompt = f"""
+        You are a neutral medical researcher. Read the following abstracts for {molecule} (Synonyms: {synonyms}).
+        Do NOT try to invent new uses or hypothesize. Your job is to summarize the current state of the research exactly as it appears in the text.
+        
         Recent PubMed Literature Abstracts (fetched live):
         {literature_context}
-
-        The following PubMed IDs (PMIDs) were retrieved from the above abstracts: {pmid_hint}
-
-        Based ONLY on the literature abstracts above and your parametric knowledge, identify 2 to 3 alternative diseases (excluding the primary indication) where {molecule} could potentially be repurposed.
         
-        OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
+        Identify:
+        1. Current established uses and primary therapeutic applications.
+        2. Known toxicities, adverse events, or risks.
+        3. Primary biological pathways being studied.
+        
+        OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks):
         {{
-            "candidates": [
-                {{
-                    "disease_name": "Name of disease using only standard ASCII hyphens (-), no special unicode characters",
-                    "pathway_overlap_score": 0.85,
-                    "reasoning": "Brief 1-sentence explanation",
-                    "citations": ["[VALID PMID: 12345678]", "[VALID PMID: 87654321]"]
-                }}
-            ]
+            "established_uses": "Brief summary",
+            "toxicities": "Detailed list of adverse events mentioned",
+            "pathway_summary": "Brief summary of mechanisms"
         }}
-        
-        CRITICAL RULES:
-        1. CRITICAL CLINICAL RULE: You must meticulously distinguish between a therapeutic target and an adverse event. If the abstracts state that a drug INCREASES the risk of a condition, causes toxicity, or is linked as a side effect (e.g., 'associated with increased depression'), you are STRICTLY FORBIDDEN from listing that condition as a repurposing candidate. You may only suggest conditions where the drug shows a protective, curative, or mitigating effect.
-        2. The 'citations' array MUST be populated with real PMIDs from the list above: [{pmid_hint}]. You may ONLY cite PMIDs that exactly match the [VALID PMID: X] tags provided in the text. Do not invent numbers.
-        3. Each candidate should cite at least 1-2 of the PMIDs above that best support the disease connection.
-        4. Use ONLY simple ASCII hyphens (-) in disease names. Never use special unicode characters.
         """
         
         try:
+            phase_1_response = await self.llm.ainvoke(phase_1_prompt)
+            phase_1_data = self._parse_json_safely(phase_1_response.content)
+            
+            # Format the review for the PDF and for Phase 2
+            literature_review = (
+                f"Established Uses: {phase_1_data.get('established_uses', 'Unknown')}\n"
+                f"Toxicities & Risks: {phase_1_data.get('toxicities', 'None identified')}\n"
+                f"Pathway Summary: {phase_1_data.get('pathway_summary', 'Unknown')}"
+            )
+            
+            self.log_status("running", "Phase 2: Extracting novel repurposing candidates based on literature baseline...")
+            
+            # PHASE 2: Biomedical Relationship Intelligence Extraction
+            prompt = f"""
+            You are a Biotech VC and expert computational biologist specialising in drug-effect relationship intelligence.
+            Target Molecule: {molecule}
+            
+            Review the following neutral literature baseline for this drug:
+            ---
+            {literature_review}
+            ---
+            
+            List ALL diseases and conditions mentioned across the abstracts. For each one, classify the relationship using the STRICT TAXONOMY below.
+            
+            RELATIONSHIP TAXONOMY (choose exactly ONE):
+            - TREATS: Drug has demonstrated direct therapeutic benefit for this condition.
+            - PROTECTIVE: Drug reduces the risk of developing this condition.
+            - CAUSES: Drug is established to directly cause this condition.
+            - WORSENS: Drug exacerbates an already existing condition.
+            - ADVERSE_EFFECT: Known unintended side effect of the drug (listed in safety data).
+            - CONTRAINDICATED: Drug is dangerous to use in patients with this condition.
+            - CORRELATED: Statistically associated, but causation is not yet established.
+            - BIOMARKER_LINKED: Drug affects a biomarker strongly associated with this condition.
+            - OFF_TARGET_EFFECT: Drug has an unintended molecular interaction documented in preclinical models.
+            
+            EVIDENCE LEVELS (choose exactly ONE):
+            RCT | Clinical_Trial | Meta_Analysis | Observational | Case_Report | Preclinical | Expert_Consensus
+            
+            CONFIDENCE (choose exactly ONE):
+            - High: Consistent finding across 3 or more independent studies.
+            - Medium: Supported by 1-2 studies with reasonable sample sizes.
+            - Low: Single case report or small preclinical study.
+            - Very_Low: Theoretical / computational prediction only.
+            
+            The following PubMed IDs (PMIDs) were retrieved from the raw abstracts: {pmid_hint}
+            
+            OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
+            {{
+                "candidates": [
+                    {{
+                        "disease_name": "Name of disease using only standard ASCII hyphens (-), no special unicode characters",
+                        "relationship_type": "One of the 9 types above",
+                        "evidence_level": "One of the evidence levels above",
+                        "confidence": "High or Medium or Low or Very_Low",
+                        "reasoning": "Brief 1-sentence explanation citing the specific biological mechanism or association found in the abstracts",
+                        "citations": ["[VALID PMID: 12345678]", "[VALID PMID: 87654321]"]
+                    }}
+                ]
+            }}
+            
+            CRITICAL RULES:
+            1. Include ALL conditions mentioned — TREATS, ADVERSE_EFFECT, CAUSES, CORRELATED, everything.
+            2. You MUST classify EVERY candidate with relationship_type, evidence_level, AND confidence. Never leave blank.
+            3. The 'citations' array MUST use ONLY [VALID PMID: X] tags from: [{pmid_hint}].
+            4. Use ONLY simple ASCII hyphens (-) in disease names.
+            """
+            
             # Send the prompt to the LLM and parse the JSON manually
             response = await self.llm.ainvoke(prompt)
             llm_result = self._parse_json_safely(response.content)
             
             raw_diseases = llm_result.get("candidates", [])
+            
+            # --- DETERMINISTIC SCORING ENGINE ---
+            # Python determines the exact numerical scores based on the relationship_type.
+            # The LLM is strictly an NLP relationship extractor now; it does not do math.
+            RELATIONSHIP_SCORES = {
+                "TREATS":           {"pathway_overlap_score": 0.85, "toxicity_penalty_score": 0.05},
+                "PROTECTIVE":       {"pathway_overlap_score": 0.75, "toxicity_penalty_score": 0.05},
+                "BIOMARKER_LINKED": {"pathway_overlap_score": 0.55, "toxicity_penalty_score": 0.20},
+                "OFF_TARGET_EFFECT":{"pathway_overlap_score": 0.40, "toxicity_penalty_score": 0.25},
+                "CORRELATED":       {"pathway_overlap_score": 0.35, "toxicity_penalty_score": 0.35},
+                "WORSENS":          {"pathway_overlap_score": 0.10, "toxicity_penalty_score": 0.85},
+                "CAUSES":           {"pathway_overlap_score": 0.05, "toxicity_penalty_score": 0.95},
+                "ADVERSE_EFFECT":   {"pathway_overlap_score": 0.05, "toxicity_penalty_score": 0.90},
+                "CONTRAINDICATED":  {"pathway_overlap_score": 0.00, "toxicity_penalty_score": 1.00},
+            }
+            
+            POSITIVE_RELATIONSHIP_TYPES = {"TREATS", "PROTECTIVE", "BIOMARKER_LINKED", "OFF_TARGET_EFFECT"}
+            for d in raw_diseases:
+                rel = d.get("relationship_type", "CORRELATED")
+                scores = RELATIONSHIP_SCORES.get(rel, RELATIONSHIP_SCORES["CORRELATED"])
+                d["pathway_overlap_score"] = scores["pathway_overlap_score"]
+                d["toxicity_penalty_score"] = scores["toxicity_penalty_score"]
+                d["effect_direction"] = "TREATS" if rel in POSITIVE_RELATIONSHIP_TYPES else "WORSENS_OR_CAUSES"
+            
+            treats_count = sum(1 for d in raw_diseases if d["effect_direction"] == "TREATS")
+            risk_count = len(raw_diseases) - treats_count
+            self.log_status("running", f"Relationship matrix: {treats_count} therapeutic + {risk_count} risk/adverse. Passing all {len(raw_diseases)} to patent filter.")
             
             # Sanitize disease names: replace non-breaking hyphens and other unicode with ASCII equivalents
             final_diseases = []
@@ -188,7 +273,7 @@ class WebIntelligenceAgent(BaseAgent):
                 final_diseases.append(d)
             
             self.log_status("done", f"AI extracted {len(final_diseases)} candidates dynamically.")
-            return {"diseases_bio": final_diseases, "synonyms": synonyms}
+            return {"diseases_bio": final_diseases, "synonyms": synonyms, "literature_review": literature_review}
             
         except Exception as e:
             self.log_status("error", f"AI parsing failed: {str(e)}")
@@ -234,6 +319,15 @@ class PatentLandscapeAgent(BaseAgent):
                             self.log_status("blocked", f"Found {count} biological patents for {disease}. FTO blocked.")
                             candidate["fto_status"] = "BLOCKED"
                             candidate["blocking_patents"] = count
+                            
+                            # Extract a sample of up to 3 patent IDs for the report
+                            results = data.get("resultList", {}).get("result", [])
+                            patent_ids = []
+                            for r in results[:3]:
+                                pid = r.get("id")
+                                if pid:
+                                    patent_ids.append(pid)
+                            candidate["patent_ids"] = patent_ids
                         else:
                             self.log_status("clear", f"No biological patents found for {disease}. IP space is clear.")
                             candidate["fto_status"] = "CLEAR"
@@ -397,12 +491,52 @@ class CommercialViabilityAgent(BaseAgent):
         if not candidates:
             return {"commercial_data": []}
 
-        self.log_status("running", f"VC Committee analyzing {len(candidates)} candidates via Public APIs...")
+        # --- VACUUM FALLBACK: Separate therapeutic targets from adverse effects ---
+        # POSITIVE relationship types that are commercially viable repurposing targets
+        VIABLE_RELATIONSHIP_TYPES = {"TREATS", "PROTECTIVE", "BIOMARKER_LINKED", "OFF_TARGET_EFFECT"}
+
+        viable_targets = [
+            c for c in candidates
+            if c.get("relationship_type", c.get("effect_direction", "TREATS")) in VIABLE_RELATIONSHIP_TYPES
+        ]
+        adverse_only = [
+            c for c in candidates
+            if c.get("relationship_type", c.get("effect_direction", "TREATS")) not in VIABLE_RELATIONSHIP_TYPES
+        ]
+
+        if not viable_targets:
+            # THE VACUUM SCENARIO: All candidates are adverse effects. Do NOT commercialize.
+            self.log_status("warning",
+                f"[Vacuum Check] All {len(candidates)} candidates are adverse/risk relationships. "
+                "No viable therapeutic targets found. Returning safety report instead of VC thesis.")
+            # Return adverse candidates annotated as non-viable, with zero commercial scores
+            safety_data = []
+            for c in adverse_only:
+                c.update({
+                    "tam_estimate": "N/A — Adverse Profile",
+                    "trial_complexity": "N/A",
+                    "competitors": [],
+                    "recommendation": (
+                        f"⚠️ SAFETY FLAG: Literature review for this molecule yielded exclusively adverse effect "
+                        f"profiles. The relationship '{c.get('relationship_type', 'ADVERSE_EFFECT')}' "
+                        f"(Evidence: {c.get('evidence_level','Unknown')}, Confidence: {c.get('confidence','Unknown')}) "
+                        f"indicates this molecule CAUSES or WORSENS {c.get('disease_name','this condition')}. "
+                        f"Do NOT proceed with commercialization for this indication."
+                    ),
+                    "risk_adjusted_score": 0.0,
+                    "effect_direction": "WORSENS_OR_CAUSES",
+                })
+                safety_data.append(c)
+            return {"commercial_data": safety_data}
+
+        self.log_status("running",
+            f"VC Committee analyzing {len(viable_targets)} viable target(s) "
+            f"({len(adverse_only)} adverse-only candidates excluded from commercial analysis)...")
         final_commercial_data = []
 
-        # 1. Fetch Hard Data concurrently using httpx
+        # 1. Fetch Hard Data concurrently using httpx — only for viable therapeutic targets
         async with httpx.AsyncClient(timeout=15.0) as client:
-            for candidate in candidates:
+            for candidate in viable_targets:
                 disease = candidate.get("disease_name")
                 
                 # Run FDA and Trials APIs at the exact same time
@@ -413,7 +547,14 @@ class CommercialViabilityAgent(BaseAgent):
                 # Fetch dynamic financial data for the specific disease
                 tam_estimate = await self._fetch_financial_tam(disease)
 
-                # 2. The Final Synthesis (Only ONE LLM call per candidate, deeply grounded in facts)
+                # 2. The Final Synthesis — VC thesis grounded in hard API facts + relationship intelligence
+                pathway_score = candidate.get("pathway_overlap_score", 0.5)
+                toxicity_penalty = candidate.get("toxicity_penalty_score", 0.0)
+                effect_direction = candidate.get("effect_direction", "TREATS")
+                relationship_type = candidate.get("relationship_type", "CORRELATED")
+                evidence_level = candidate.get("evidence_level", "Observational")
+                confidence = candidate.get("confidence", "Low")
+                
                 prompt = f"""
                 You are a Biotech Venture Capitalist. Write a strict 2-sentence investment thesis for repurposing a drug for {disease}.
                 
@@ -421,11 +562,18 @@ class CommercialViabilityAgent(BaseAgent):
                 * If YES (e.g., Aspirin for preeclampsia/fetal growth): You MUST explicitly state: "Note: This molecule is already heavily utilized off-label as the standard of care for this indication. The commercial opportunity lies in formalizing FDA approval, developing targeted delivery mechanisms, or creating proprietary formulations, rather than novel discovery."
                 * If NO: Proceed with the standard novel repurposing thesis.
                 
+                EVIDENCE QUALITY CHECK: Review the Relationship Intelligence below. If confidence is "Low" or "Very_Low", you MUST begin your recommendation with: "Note: This indication is supported by limited evidence ({evidence_level}) and requires Phase 2 clinical validation before commercial commitment."
+                
                 DO NOT GUESS NUMBERS. Use ONLY these hard facts pulled from live government/financial APIs:
                 - Existing FDA Competitors: {', '.join(competitors)}
                 - Active Clinical Trials: {trials['total_active']} (Phase 3: {trials['phase_3_trials']})
                 - Trial Complexity Rating: {trials['complexity']}
                 - Market Size Proxy (TAM): {tam_estimate}
+                - Relationship Type: {relationship_type}
+                - Evidence Level: {evidence_level}
+                - Confidence: {confidence}
+                - Pathway Overlap Score: {pathway_score:.2f}
+                - Toxicity Penalty Score: {toxicity_penalty:.2f} (if > 0.5, you MUST propose a novel 505(b)(2) formulation or delivery mechanism to mitigate this toxicity risk)
                 
                 Output JSON:
                 {{
@@ -433,7 +581,7 @@ class CommercialViabilityAgent(BaseAgent):
                     "tam_estimate": "{tam_estimate}",
                     "trial_complexity": "{trials['complexity']}",
                     "competitors": {competitors},
-                    "recommendation": "If is_currently_used_off_label is TRUE, you MUST start this paragraph with 'Note: This is already standard-of-care off-label.' Your 2-sentence VC thesis here based on the data above."
+                    "recommendation": "Your VC thesis here, following all the rules above."
                 }}
                 """
                 
@@ -444,17 +592,45 @@ class CommercialViabilityAgent(BaseAgent):
                 # CRITICAL FIX: always use the hard API-derived complexity — never trust LLM to override it
                 hard_complexity = trials["complexity"]
                 
+                # --- Risk-Adjusted Score Formula ---
+                import re as _re2
+                tam_nums = _re2.findall(r'[-+]?\d*\.?\d+', str(tam_estimate))
+                tam_val = float(tam_nums[0]) if tam_nums else 0.0
+                tam_weight = min(tam_val / 50.0, 1.0)   # Normalize: cap at $50B = 1.0
+                risk_adjusted_score = round(
+                    (tam_weight * 0.4) + (pathway_score * 0.4) - (toxicity_penalty * 0.3), 3
+                )
+                risk_adjusted_score = max(risk_adjusted_score, 0.0)  # Floor at 0
+                
                 candidate.update({
                     "tam_estimate": ai_data.get("tam_estimate", tam_estimate),
-                    "trial_complexity": hard_complexity,   # Sourced from ClinicalTrials.gov, not LLM
+                    "trial_complexity": hard_complexity,
                     "competitors": ai_data.get("competitors", competitors),
-                    "recommendation": ai_data.get("recommendation", "Awaiting manual review.")
+                    "recommendation": ai_data.get("recommendation", "Awaiting manual review."),
+                    "risk_adjusted_score": risk_adjusted_score,
+                    "pathway_overlap_score": pathway_score,
+                    "toxicity_penalty_score": toxicity_penalty,
+                    "effect_direction": effect_direction,
                 })
                 
                 final_commercial_data.append(candidate)
                 
                 # Polite buffer to avoid API throttling
                 await asyncio.sleep(1)
+
+        # Append the adverse/risk candidates back into the final data so they appear on the scatter plot
+        for c in adverse_only:
+            c.update({
+                "tam_estimate": "N/A — Adverse Profile",
+                "trial_complexity": "N/A",
+                "competitors": [],
+                "recommendation": (
+                    f"⚠️ SAFETY FLAG: Literature review indicates this molecule CAUSES or WORSENS "
+                    f"{c.get('disease_name','this condition')}. Do NOT commercialize."
+                ),
+                "risk_adjusted_score": 0.0,
+            })
+            final_commercial_data.append(c)
 
         self.log_status("done", "Market analysts complete.")
         return {"commercial_data": final_commercial_data}
@@ -612,16 +788,16 @@ class IQVIASupplyChainAgent(BaseAgent):
             Based purely on your parametric knowledge of its global generic availability, manufacturing footprint, and market history:
             Extract the API availability, top exporting countries, supply chain risk, market trends, and repurposing score.
             
-            Since the drug was not found in the local database, you MUST provide an educated estimation based on your internal knowledge of global pharmaceuticals. You must output actual estimated numbers and values, but append '(AI Estimated)' to the text fields. For repurposing_score, provide a numerical estimate between 0.0 and 10.0.
+            CRITICAL RULE: You are STRICTLY FORBIDDEN from returning "N/A", "Unknown", "Not available", or null values for any field. You MUST generate an educated estimate based on your parametric knowledge of this drug. Append '(AI Estimated)' to all text fields to indicate they are estimates. For repurposing_score, you MUST provide a numerical value between 0.0 and 10.0 — never return null or N/A.
             
             OUTPUT EXACTLY IN THIS JSON FORMAT AND NOTHING ELSE (No markdown, no backticks, no conversational text):
             {{
-                "api_availability": "High/Medium/Low",
+                "api_availability": "High/Medium/Low (AI Estimated)",
                 "top_exporting_countries": ["Country1", "Country2"],
-                "supply_chain_risk": "Low/Medium/High",
-                "repurposing_score": 8.5,
-                "market_trend": "Brief trend summary",
-                "clinical_pipeline_status": "Brief status"
+                "supply_chain_risk": "Low/Medium/High (AI Estimated)",
+                "repurposing_score": 7.5,
+                "market_trend": "Brief trend summary (AI Estimated)",
+                "clinical_pipeline_status": "Brief status (AI Estimated)"
             }}
             """
         else:

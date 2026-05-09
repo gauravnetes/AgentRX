@@ -175,3 +175,90 @@ def generate_repurposing_score_donut(score: float, max_score: float = 10.0) -> i
     plt.close(fig)
     buf.seek(0)
     return buf
+
+
+def generate_risk_reward_scatter(candidates: List[Dict[str, Any]]) -> io.BytesIO:
+    """
+    Generate a Risk/Reward scatter plot.
+    X-axis: pathway_overlap_score (Efficacy)
+    Y-axis: toxicity_penalty_score (Risk)
+    Bubble size: risk_adjusted_score
+    """
+    _setup_theme()
+
+    if not candidates:
+        return None
+
+    fig, ax = plt.subplots(figsize=(8, 6), dpi=150)
+
+    # Draw quadrant dividers
+    ax.axvline(x=0.5, color=COLOR_LIGHT, linewidth=1.0, linestyle='--')
+    ax.axhline(y=0.5, color=COLOR_LIGHT, linewidth=1.0, linestyle='--')
+
+    # Quadrant labels
+    ax.text(0.75, 0.92, "High Efficacy / High Risk\n(505(b)(2) Play)", ha='center',
+            transform=ax.transAxes, fontsize=7, color=COLOR_ACCENT, style='italic')
+    ax.text(0.75, 0.08, "HIGH VALUE TARGETS", ha='center',
+            transform=ax.transAxes, fontsize=7, color=COLOR_DARK, fontweight='bold')
+    ax.text(0.25, 0.92, "Low Efficacy / High Risk\n(Avoid)", ha='center',
+            transform=ax.transAxes, fontsize=7, color=COLOR_LIGHT, style='italic')
+    ax.text(0.25, 0.08, "Low Priority", ha='center',
+            transform=ax.transAxes, fontsize=7, color=COLOR_LIGHT, style='italic')
+
+    for c in candidates:
+        x = float(c.get("pathway_overlap_score", 0.5))
+        y = float(c.get("toxicity_penalty_score", 0.1))
+        score = float(c.get("risk_adjusted_score", 0.3))
+        name = _sanitize_label(c.get("disease_name", "Unknown"))
+        rel_type = c.get("relationship_type", c.get("effect_direction", "CORRELATED"))
+        confidence = c.get("confidence", "")
+
+        # 3-tier color coding by relationship type
+        POSITIVE_TYPES = {"TREATS", "PROTECTIVE"}
+        NEUTRAL_TYPES  = {"BIOMARKER_LINKED", "OFF_TARGET_EFFECT", "CORRELATED"}
+        # everything else = risk/adverse tier
+        if rel_type in POSITIVE_TYPES:
+            color = COLOR_DARK      # Black — high-value targets
+        elif rel_type in NEUTRAL_TYPES:
+            color = COLOR_ACCENT    # Medium gray — uncertain / exploratory
+        else:
+            color = COLOR_LIGHT     # Light gray — risk / adverse / contraindicated
+
+        bubble_size = max(score * 800, 80)
+
+        ax.scatter(x, y, s=bubble_size, color=color, alpha=0.80,
+                   edgecolors=COLOR_DARK, linewidths=0.8)
+
+        label_text = name if not confidence else f"{name}\n({confidence})"
+        ax.annotate(
+            label_text, (x, y),
+            textcoords="offset points", xytext=(0, 10),
+            ha='center', fontsize=7, color=COLOR_DARK,
+            fontweight='bold' if rel_type in POSITIVE_TYPES else 'normal'
+        )
+
+    ax.set_xlim(0, 1.05)
+    ax.set_ylim(0, 1.05)
+    ax.set_xlabel("Pathway Overlap Score (Efficacy →)", fontsize=9)
+    ax.set_ylabel("Toxicity Penalty Score (← Risk)", fontsize=9)
+    ax.set_title("Risk / Reward Matrix — All Candidate Indications", fontsize=11, fontweight='bold', pad=15)
+
+    # 3-tier legend
+    from matplotlib.lines import Line2D
+    legend_elements = [
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_DARK,   markersize=9, label='Therapeutic (TREATS / PROTECTIVE)'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_ACCENT,  markersize=9, label='Exploratory (CORRELATED / BIOMARKER)'),
+        Line2D([0], [0], marker='o', color='w', markerfacecolor=COLOR_LIGHT,   markersize=9, label='Risk / Adverse (CAUSES / WORSENS / etc.)'),
+    ]
+    ax.legend(handles=legend_elements, loc='lower right', fontsize=7, framealpha=0.9)
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
+    plt.tight_layout()
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    plt.close(fig)
+    buf.seek(0)
+    return buf
