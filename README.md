@@ -273,8 +273,7 @@ Important config keys include:
 3. Run the backend locally and test changes
 4. Submit a PR with clear architectural notes
 
----
-
+----
 ## Contact
 
 For this repository, use the internal `context.md` as the source of truth for architecture, current implementation state, and feature planning.
