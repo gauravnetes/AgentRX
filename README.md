@@ -250,7 +250,6 @@ Important config keys include:
 
 ## Known Limitations
 
-- Frontend is not implemented in this repository; the `frontend/` folder is a placeholder.
 - PostgreSQL and Neo4j integrations are referenced in config, but the current pipeline uses SQLite checkpoints for runtime state.
 - RAG vector search and Neo4j knowledge graph features are planned, not yet wired into the current flow.
 - Some external API calls are mocked or dependent on available API keys.
